@@ -106,6 +106,7 @@
                     </h1>
                 </div>
                 <div class="hidden md:block">
+                    <!-- Updated Header Text -->
                     <h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2>
                 </div>
                 <div class="flex items-center gap-3">
@@ -327,7 +328,6 @@
                 return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear();
             });
 
-            // Filter Habis Kontrak
             const expiringThisMonth = dataKaryawan.filter(d => {
                 const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak', 'contract_end']);
                 if(!dateVal) return false;
@@ -358,32 +358,23 @@
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalAkhwat}</h3><p class="text-xs text-slate-500">Akhwat (P)</p></div>
                     </div>
                     
-                    <!-- Grafik Grid UPDATE: Baris 1 -->
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Gender Chart (Pie) -->
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-1">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                             <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3>
-                            <div class="relative h-60 flex justify-center"><canvas id="genderChart"></canvas></div>
+                            <div class="relative h-64 flex justify-center"><canvas id="genderChart"></canvas></div>
                         </div>
 
-                         <!-- Education Chart (Stacked Bar) -->
-                         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
-                            <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3>
-                            <div class="relative h-60 w-full"><canvas id="eduChart"></canvas></div>
+                         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi</h3>
+                            <div class="relative h-64 w-full"><canvas id="divisionChart"></canvas></div>
                         </div>
                     </div>
 
-                     <!-- Grafik Grid UPDATE: Baris 2 (Full Width) -->
-                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mt-0">
-                        <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi (Urut Departemen)</h3>
-                        <div class="relative w-full overflow-x-auto">
-                             <div class="min-w-[600px]"><!-- Wrapper scrollable untuk mobile -->
-                                <canvas id="divisionChart"></canvas>
-                             </div>
-                        </div>
+                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3>
+                        <div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div>
                     </div>
                     
-                    <!-- Kontrak Berakhir Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                             <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-x" class="w-4 h-4 text-red-500"></i> Habis Kontrak Bulan Ini</h3><span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringThisMonth.length}</span></div>
@@ -417,33 +408,18 @@
                 </div>`;
         }
 
-        // --- DASHBOARD CHARTS ---
         function initDashboardCharts() {
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
 
-            // 1. Chart Gender (Pie Chart - Total Ikhwan vs Akhwat)
+            // 1. Chart Gender (Pie Chart - Total)
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
 
-            // 2. Chart Gender per Divisi (Stacked Bar - Sorted by Department)
-            // Logic: Group by Division, then sort divisions based on Department name
-            let divMap = {}; // divName -> deptName
-            dataKaryawan.forEach(d => {
-                const div = getProp(d, ['divisi', 'division']);
-                const dept = getProp(d, ['departemen', 'department']);
-                if (div) {
-                    const cleanDiv = String(div).trim();
-                    if (!divMap[cleanDiv]) divMap[cleanDiv] = dept || 'Z-Lainnya'; 
-                }
-            });
-            
-            const divisions = Object.keys(divMap).sort((a, b) => {
-                const deptA = divMap[a].toLowerCase();
-                const deptB = divMap[b].toLowerCase();
-                if (deptA < deptB) return -1;
-                if (deptA > deptB) return 1;
-                return a.toLowerCase().localeCompare(b.toLowerCase());
-            });
+            // 2. Chart Gender per Divisi (Stacked Bar)
+            const divisions = [...new Set(dataKaryawan.map(d => {
+                const val = getProp(d, ['divisi', 'division']);
+                return val ? String(val).trim() : null;
+            }).filter(Boolean))].sort();
 
             const malePerDiv = divisions.map(div => 
                 dataKaryawan.filter(d => {
@@ -459,20 +435,17 @@
                 }).length
             );
 
-            // 3. Chart Education (Grouped & Simplified)
+            // 3. Chart Education (Grouped)
             const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             
-            // Helper: Grouping Education Levels
             const normalizeEdu = (edu) => {
                 if (!edu) return 'Lainnya';
                 edu = String(edu).toUpperCase().trim();
-                
                 if (['S3', 'S2', 'DOKTOR', 'MASTER', 'PASCA', 'PHD', 'M.', 'DR.'].some(k => edu.includes(k))) return 'Pascasarjana';
                 if (['S1', 'D4', 'SARJANA', 'BACHELOR', 'S.K', 'S.P', 'S.E', 'S.T', 'S.S'].some(k => edu.includes(k) || edu === 'S1')) return 'Sarjana';
                 if (['D3', 'D2', 'D1', 'DIPLOMA', 'A.MD'].some(k => edu.includes(k))) return 'Diploma';
                 if (['SMA', 'SMK', 'MA', 'SLTA', 'STM', 'SMEA'].some(k => edu.includes(k))) return 'SMA/K';
                 if (['SMP', 'MTS', 'SLTP', 'SD', 'MI'].some(k => edu.includes(k))) return 'Dasar';
-                
                 return 'Lainnya';
             };
 
@@ -495,12 +468,10 @@
                 };
             });
 
-            // Cleanup & Render
             if (genderChartInstance) genderChartInstance.destroy();
             if (divisionChartInstance) divisionChartInstance.destroy();
             if (eduChartInstance) eduChartInstance.destroy();
 
-            // Render 1: Gender Pie
             const ctxGender = document.getElementById('genderChart').getContext('2d');
             genderChartInstance = new Chart(ctxGender, {
                 type: 'doughnut',
@@ -513,22 +484,12 @@
                         hoverOffset: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
             });
 
-            // Render 2: Division Gender Stacked Bar (NEW) - Show all divisions
             const ctxDiv = document.getElementById('divisionChart').getContext('2d');
-            
-            // Adjust container height dynamically based on division count for readability
             const divChartContainer = document.getElementById('divisionChart').parentNode;
             if (divisions.length > 0) {
-                 // Set height: 25px per bar + 50px buffer. Minimum 300px.
                  const newHeight = Math.max(300, (divisions.length * 25 + 50));
                  divChartContainer.style.height = newHeight + 'px'; 
             }
@@ -545,22 +506,12 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    indexAxis: 'y', // Horizontal Layout
-                    scales: { 
-                        x: { stacked: true }, 
-                        y: { 
-                            stacked: true, 
-                            ticks: { 
-                                font: { size: 10 },
-                                autoSkip: false // Force show all labels
-                            } 
-                        } 
-                    },
+                    indexAxis: 'y',
+                    scales: { x: { stacked: true }, y: { stacked: true, ticks: { font: { size: 10 }, autoSkip: false } } },
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
                 }
             });
 
-            // Render 3: Edu Stacked Bar
             const ctxEdu = document.getElementById('eduChart').getContext('2d');
             eduChartInstance = new Chart(ctxEdu, {
                 type: 'bar',
@@ -568,11 +519,8 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    indexAxis: 'y', // Horizontal
-                    scales: { 
-                        x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } }, 
-                        y: { stacked: true, ticks: { font: { size: 10, weight: '500' } }, grid: { display: false } } 
-                    }, 
+                    indexAxis: 'y',
+                    scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } }, y: { stacked: true, ticks: { font: { size: 10, weight: '500' } }, grid: { display: false } } }, 
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, usePointStyle: true } } } 
                 }
             });
@@ -588,7 +536,9 @@
                 const title = getProp(item, ['title', 'judul']);
                 const summary = getProp(item, ['summary', 'ringkasan', 'deskripsi_singkat']) || '';
                 const id = getProp(item, 'id');
-                return `<div onclick="openInfoDetail(${id})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group cursor-pointer"><div class="flex justify-between items-start mb-3"><span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">${type}</span><span class="text-xs text-slate-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${formatDateIndo(date)}</span></div><h3 class="font-bold text-slate-800 mb-2 text-base">${title}</h3><p class="text-sm text-slate-500 leading-relaxed line-clamp-2">${summary}</p></div>`;
+                // Replace \n with <br> for display
+                const summaryHtml = summary.replace(/\n/g, '<br>');
+                return `<div onclick="openInfoDetail(${id})" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group cursor-pointer"><div class="flex justify-between items-start mb-3"><span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">${type}</span><span class="text-xs text-slate-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${formatDateIndo(date)}</span></div><h3 class="font-bold text-slate-800 mb-2 text-base">${title}</h3><p class="text-sm text-slate-500 leading-relaxed line-clamp-2">${summaryHtml}</p></div>`;
             }).join('');
             return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="info" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Pusat Informasi</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
         }
@@ -760,11 +710,14 @@
             const date = getProp(item, ['date', 'tanggal']);
             const summary = getProp(item, ['summary', 'ringkasan', 'deskripsi_singkat']);
             const detail = getProp(item, ['detail', 'isi', 'konten']) || 'Tidak ada informasi tambahan.';
+            
+            // Handle newlines by replacing with <br>
+            const detailHtml = detail.replace(/\n/g, '<br>');
 
             modalContent.innerHTML = `
                 <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-50"><i data-lucide="x" class="w-6 h-6"></i></button>
                 <div class="text-center mb-6 pt-2"><span class="bg-blue-100 text-blue-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">${type}</span><h2 class="text-2xl font-bold text-slate-800 mt-4 leading-snug">${title}</h2><p class="text-sm text-slate-400 mt-2 flex items-center justify-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i> ${formatDateIndo(date)}</p></div>
-                <div class="prose prose-sm max-w-none text-slate-600 leading-relaxed text-justify"><p class="font-medium mb-4">${summary}</p><hr class="my-4 border-slate-100"><p>${detail}</p></div>
+                <div class="prose prose-sm max-w-none text-slate-600 leading-relaxed text-justify"><p class="font-medium mb-4">${summary}</p><hr class="my-4 border-slate-100"><div class="mt-4">${detailHtml}</div></div>
                 <div class="mt-8 text-center"><button onclick="closeModal()" class="px-6 py-2 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition text-sm font-medium">Tutup</button></div>`;
             modal.classList.remove('hidden');
             lucide.createIcons();
@@ -781,6 +734,9 @@
             const pages = getProp(book, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman']);
             const desc = getProp(book, ['deskripsi', 'sinopsis', 'ringkasan']) || 'Tidak ada deskripsi.';
             const link = getProp(book, ['link_download', 'link', 'url']);
+            
+            // Handle newlines by replacing with <br>
+            const descHtml = desc.replace(/\n/g, '<br>');
 
             const downloadBtn = link 
                 ? `<a href="${link}" target="_blank" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 font-medium shadow-lg shadow-blue-200"><i data-lucide="download" class="w-5 h-5"></i> Download PDF</a>`
@@ -789,7 +745,7 @@
             modalContent.innerHTML = `
                 <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-50"><i data-lucide="x" class="w-6 h-6"></i></button>
                 <div class="flex flex-col items-center mb-6"><div class="w-24 h-32 ${book.color} rounded-lg flex items-center justify-center shadow-lg mb-4 transform hover:scale-105 transition-transform duration-300"><i data-lucide="book" class="w-10 h-10 opacity-80"></i></div><h2 class="text-xl font-bold text-slate-800 text-center">${title}</h2><p class="text-sm text-blue-600 font-medium mt-1">${author}</p><span class="text-xs text-slate-400 mt-2 bg-slate-50 px-2 py-1 rounded">${pages} Halaman</span></div>
-                <div class="bg-slate-50 p-4 rounded-xl mb-6"><h4 class="font-bold text-slate-700 text-sm mb-2">Sinopsis</h4><p class="text-sm text-slate-600 leading-relaxed">${desc}</p></div>
+                <div class="bg-slate-50 p-4 rounded-xl mb-6"><h4 class="font-bold text-slate-700 text-sm mb-2">Sinopsis</h4><p class="text-sm text-slate-600 leading-relaxed">${descHtml}</p></div>
                 ${downloadBtn}`;
             modal.classList.remove('hidden');
             lucide.createIcons();
