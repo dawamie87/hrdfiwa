@@ -20,31 +20,18 @@
         
         /* Sidebar Styling Fixes */
         .sidebar-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem; 
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            font-size: 0.9rem; 
-            font-weight: 500;
+            display: flex; align-items: center; gap: 0.75rem; 
+            padding: 0.75rem 1rem; border-radius: 0.75rem;
+            font-size: 0.9rem; font-weight: 500;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-            margin-bottom: 0.25rem;
+            border: 1px solid transparent; margin-bottom: 0.25rem;
         }
         .sidebar-active {
-            background-color: #eff6ff; /* blue-50 */
-            color: #2563eb; /* blue-600 */
-            border-color: #dbeafe; /* blue-100 */
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            background-color: #eff6ff; color: #2563eb;
+            border-color: #dbeafe; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
-        .sidebar-inactive {
-            color: #64748b; /* slate-500 */
-        }
-        .sidebar-inactive:hover {
-            background-color: #f8fafc;
-            color: #1e293b;
-            border-color: #e2e8f0;
-        }
+        .sidebar-inactive { color: #64748b; }
+        .sidebar-inactive:hover { background-color: #f8fafc; color: #1e293b; border-color: #e2e8f0; }
 
         /* Nav Mobile Styles */
         .active-tab-nav { color: #2563eb; }
@@ -61,7 +48,7 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen">
 
-    <!-- SIDEBAR (Desktop) - Sticky Fixed -->
+    <!-- SIDEBAR (Desktop) -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-100 mb-2 bg-white z-10">
             <h1 class="text-xl font-bold text-blue-900 flex items-center gap-3">
@@ -73,38 +60,16 @@
             <p class="text-xs text-slate-400 mt-2 pl-12 font-medium tracking-wide">SISTEM TERPADU v2.0</p>
         </div>
         <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
-            <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full">
-                <i data-lucide="home" class="w-5 h-5"></i>
-                <span class="flex-1 text-left">Dashboard</span>
-            </button>
-            <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="bell-ring" class="w-5 h-5"></i>
-                <span class="flex-1 text-left">Pusat Informasi</span>
-            </button>
-            <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="users" class="w-5 h-5"></i>
-                <span class="flex-1 text-left">Data Karyawan</span>
-            </button>
-            <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="book-open" class="w-5 h-5"></i>
-                <span class="flex-1 text-left">Ebook Panduan</span>
-            </button>
-            <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="headset" class="w-5 h-5"></i>
-                <span class="flex-1 text-left">Layanan HRD</span>
-            </button>
+            <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full"><i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span></button>
+            <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full"><i data-lucide="bell-ring" class="w-5 h-5"></i><span class="flex-1 text-left">Pusat Informasi</span></button>
+            <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full"><i data-lucide="users" class="w-5 h-5"></i><span class="flex-1 text-left">Data Karyawan</span></button>
+            <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full"><i data-lucide="book-open" class="w-5 h-5"></i><span class="flex-1 text-left">Ebook Panduan</span></button>
+            <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full"><i data-lucide="headset" class="w-5 h-5"></i><span class="flex-1 text-left">Layanan HRD</span></button>
         </nav>
-        
-        <!-- User Profile Mini -->
         <div class="p-4 border-t border-slate-100 bg-white z-10">
             <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm">
-                    <i data-lucide="user" class="w-5 h-5"></i>
-                </div>
-                <div class="min-w-0">
-                    <p class="text-sm font-semibold text-slate-700 truncate">Karyawan</p>
-                    <p class="text-xs text-slate-500 truncate">FIWA Member</p>
-                </div>
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm"><i data-lucide="user" class="w-5 h-5"></i></div>
+                <div class="min-w-0"><p class="text-sm font-semibold text-slate-700 truncate">Karyawan</p><p class="text-xs text-slate-500 truncate">FIWA Member</p></div>
             </div>
         </div>
     </aside>
@@ -113,29 +78,17 @@
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative">
         <header class="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:border-none md:bg-transparent md:static">
             <div class="max-w-7xl mx-auto px-4 py-3 md:py-6 flex justify-between items-center">
-                <div class="md:hidden">
-                    <h1 class="text-lg font-bold text-blue-900 flex items-center gap-2">
-                        <i data-lucide="layout-grid" class="w-5 h-5 text-blue-600"></i> HRD Info
-                    </h1>
-                </div>
-                <div class="hidden md:block">
-                    <h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2>
-                </div>
+                <div class="md:hidden"><h1 class="text-lg font-bold text-blue-900 flex items-center gap-2"><i data-lucide="layout-grid" class="w-5 h-5 text-blue-600"></i> HRD Info</h1></div>
+                <div class="hidden md:block"><h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2></div>
                 <div class="flex items-center gap-3">
-                    <button id="installPWA" class="hidden text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-medium shadow-md shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2">
-                        <i data-lucide="download" class="w-3 h-3"></i> Install App
-                    </button>
-                    <button class="p-2 rounded-full hover:bg-white hover:shadow-sm transition text-slate-600 relative">
-                        <i data-lucide="bell" class="w-5 h-5"></i>
-                        <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border border-white rounded-full"></span>
-                    </button>
+                    <button id="installPWA" class="hidden text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-medium shadow-md shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2"><i data-lucide="download" class="w-3 h-3"></i> Install App</button>
+                    <button class="p-2 rounded-full hover:bg-white hover:shadow-sm transition text-slate-600 relative"><i data-lucide="bell" class="w-5 h-5"></i><span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border border-white rounded-full"></span></button>
                 </div>
             </div>
         </header>
 
         <main id="app-content" class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8"></main>
 
-        <!-- GLOBAL MODAL -->
         <div id="global-modal" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
@@ -169,7 +122,7 @@
         let currentPage = 'beranda';
         let currentDirectorTab = 'ikhwan';
         let searchKeyword = '', sortOrder = 'name_asc', filterDept = '', filterDiv = '';
-        let genderChartInstance = null, eduChartInstance = null;
+        let genderChartInstance = null, divisionChartInstance = null, eduChartInstance = null;
 
         // --- HELPER SMART MAPPING ---
         function getProp(obj, keys) {
@@ -187,7 +140,7 @@
             return null;
         }
 
-        // --- FORMAT TANGGAL INDONESIA (dd/mm/yyyy) ---
+        // Helpers standar
         function formatDateIndo(dateString) {
             if (!dateString) return "-";
             const date = new Date(dateString);
@@ -197,7 +150,6 @@
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         }
-
         function hitungMasaKerja(dateString) {
             if (!dateString) return "";
             let startDate = new Date(dateString);
@@ -233,9 +185,21 @@
         // --- FETCH DATA ---
         async function fetchAllData() {
             if (!API_URL) return;
-            fetchDataGeneric('karyawan', (data) => { dataKaryawan = data; if (currentPage === 'beranda' || currentPage === 'direktur') renderPage(currentPage); });
-            fetchDataGeneric('info', (data) => { dataInfo = data; if (currentPage === 'informasi' || currentPage === 'beranda') renderPage(currentPage); });
-            fetchDataGeneric('ebook', (data) => { dataEbooks = data.map((item, index) => ({ ...item, color: ebookColors[index % ebookColors.length] })); if (currentPage === 'ebook' || currentPage === 'beranda') renderPage(currentPage); });
+            
+            fetchDataGeneric('karyawan', (data) => {
+                dataKaryawan = data;
+                if (currentPage === 'beranda' || currentPage === 'direktur') renderPage(currentPage);
+            });
+
+            fetchDataGeneric('info', (data) => {
+                dataInfo = data;
+                if (currentPage === 'informasi' || currentPage === 'beranda') renderPage(currentPage);
+            });
+
+            fetchDataGeneric('ebook', (data) => {
+                dataEbooks = data.map((item, index) => ({ ...item, color: ebookColors[index % ebookColors.length] }));
+                if (currentPage === 'ebook' || currentPage === 'beranda') renderPage(currentPage);
+            });
         }
 
         async function fetchDataGeneric(type, onSuccess) {
@@ -244,15 +208,7 @@
                 const response = await fetch(`${API_URL}?type=${type}&t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
-                
-                if (type === 'info' && data.length > 0 && (data[0].nip || data[0].nama_lengkap)) {
-                    console.warn(`Warning: Data ${type} salah.`);
-                    return; 
-                }
-
-                if (Array.isArray(data)) {
-                    onSuccess(data);
-                }
+                if (Array.isArray(data)) onSuccess(data);
             } catch (e) {
                 console.error(`Gagal memuat ${type}:`, e);
             } finally {
@@ -277,7 +233,6 @@
         function renderPage(pageName) {
             currentPage = pageName;
             updateNavStyles();
-            
             const content = document.getElementById('app-content');
             content.innerHTML = '';
 
@@ -364,12 +319,29 @@
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalIkhwan}</h3><p class="text-xs text-slate-500">Ikhwan (L)</p></div>
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalAkhwat}</h3><p class="text-xs text-slate-500">Akhwat (P)</p></div>
                     </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-1"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3><div class="relative h-48 flex justify-center"><canvas id="genderChart"></canvas></div></div>
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-2"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3><div class="relative h-48 w-full"><canvas id="eduChart"></canvas></div></div>
+                    
+                    <!-- Grafik Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Gender Chart (Pie) -->
+                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3>
+                            <div class="relative h-64 flex justify-center"><canvas id="genderChart"></canvas></div>
+                        </div>
+
+                         <!-- Gender per Divisi Chart (Stacked Bar) - NEW -->
+                         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi</h3>
+                            <div class="relative h-64 w-full"><canvas id="divisionChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Education Chart (Full Width) -->
+                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3>
+                        <div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div>
                     </div>
                     
-                    <!-- UPDATE: Kontrak Berakhir Section -->
+                    <!-- Kontrak Berakhir Section -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                             <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-x" class="w-4 h-4 text-red-500"></i> Habis Kontrak Bulan Ini</h3><span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringThisMonth.length}</span></div>
@@ -403,18 +375,25 @@
                 </div>`;
         }
 
-        // --- DASHBOARD CHARTS ---
         function initDashboardCharts() {
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
 
-            // 1. Chart Gender (Pie Chart)
+            // 1. Chart Gender (Pie Chart - Total)
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
 
-            // 2. Chart Education (Grouped & Simplified)
+            // 2. Chart Gender per Divisi (Stacked Bar)
+            const divisions = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
+            const malePerDiv = divisions.map(div => 
+                dataKaryawan.filter(d => getProp(d, ['divisi', 'division']) === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length
+            );
+            const femalePerDiv = divisions.map(div => 
+                dataKaryawan.filter(d => getProp(d, ['divisi', 'division']) === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length
+            );
+
+            // 3. Chart Education (Grouped)
             const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             
-            // Helper: Grouping Education Levels
             const normalizeEdu = (edu) => {
                 if (!edu) return 'Lainnya';
                 edu = String(edu).toUpperCase().trim();
@@ -427,15 +406,7 @@
             };
 
             const eduGroups = ['Pascasarjana', 'Sarjana', 'Diploma', 'SMA/K', 'Dasar', 'Lainnya'];
-            
-            const eduColors = {
-                'Pascasarjana': '#1e3a8a', // Dark Blue
-                'Sarjana': '#2563eb',      // Blue
-                'Diploma': '#60a5fa',      // Light Blue
-                'SMA/K': '#94a3b8',        // Slate
-                'Dasar': '#cbd5e1',        // Light Slate
-                'Lainnya': '#e2e8f0'       // Gray
-            };
+            const eduColors = { 'Pascasarjana': '#1e3a8a', 'Sarjana': '#2563eb', 'Diploma': '#60a5fa', 'SMA/K': '#94a3b8', 'Dasar': '#cbd5e1', 'Lainnya': '#e2e8f0' };
 
             const eduDatasets = eduGroups.map((group) => {
                 return {
@@ -455,45 +426,46 @@
 
             // Cleanup & Render
             if (genderChartInstance) genderChartInstance.destroy();
+            if (divisionChartInstance) divisionChartInstance.destroy();
             if (eduChartInstance) eduChartInstance.destroy();
 
-            // Gender Chart
+            // Render 1: Gender Pie
             const ctxGender = document.getElementById('genderChart').getContext('2d');
             genderChartInstance = new Chart(ctxGender, {
                 type: 'doughnut',
                 data: {
                     labels: ['Ikhwan', 'Akhwat'],
+                    datasets: [{
+                        data: [totalIkhwan, totalAkhwat],
+                        backgroundColor: ['#10b981', '#ec4899'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+            });
+
+            // Render 2: Division Gender Stacked Bar (NEW)
+            const ctxDiv = document.getElementById('divisionChart').getContext('2d');
+            divisionChartInstance = new Chart(ctxDiv, {
+                type: 'bar',
+                data: {
+                    labels: divisions,
                     datasets: [
-                        {
-                            data: [totalIkhwan, totalAkhwat],
-                            backgroundColor: ['#10b981', '#ec4899'], // Emerald & Pink
-                            borderWidth: 0,
-                            hoverOffset: 4
-                        }
+                        { label: 'Ikhwan', data: malePerDiv, backgroundColor: '#10b981', stack: 'Stack 0' },
+                        { label: 'Akhwat', data: femalePerDiv, backgroundColor: '#ec4899', stack: 'Stack 0' }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) { label += ': '; }
-                                    let value = context.raw;
-                                    let total = context.chart._metasets[context.datasetIndex].total;
-                                    let percentage = Math.round((value / total) * 100) + '%';
-                                    return label + value + ' (' + percentage + ')';
-                                }
-                            }
-                        }
-                    }
+                    indexAxis: 'y',
+                    scales: { x: { stacked: true }, y: { stacked: true, ticks: { font: { size: 10 } } } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
                 }
             });
 
-            // Edu Chart (Stacked Bar - Horizontal)
+            // Render 3: Edu Stacked Bar
             const ctxEdu = document.getElementById('eduChart').getContext('2d');
             eduChartInstance = new Chart(ctxEdu, {
                 type: 'bar',
@@ -501,34 +473,9 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
-                    indexAxis: 'y', // Horizontal
-                    scales: { 
-                        x: { 
-                            stacked: true, 
-                            beginAtZero: true, 
-                            ticks: { stepSize: 1, font: { size: 9 } },
-                            grid: { color: '#f1f5f9' }
-                        }, 
-                        y: { 
-                            stacked: true,
-                            ticks: { font: { size: 10, weight: '500' } },
-                            grid: { display: false }
-                        } 
-                    }, 
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, usePointStyle: true } },
-                        tooltip: {
-                            callbacks: {
-                                footer: (tooltipItems) => {
-                                    let sum = 0;
-                                    tooltipItems.forEach(function(tooltipItem) {
-                                        sum += tooltipItem.parsed.x;
-                                    });
-                                    return 'Total: ' + sum + ' Org';
-                                }
-                            }
-                        }
-                    } 
+                    indexAxis: 'y',
+                    scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } }, y: { stacked: true, ticks: { font: { size: 10, weight: '500' } }, grid: { display: false } } }, 
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } 
                 }
             });
         }
@@ -561,7 +508,6 @@
             return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="library" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Ebook Panduan</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
         }
 
-        // --- DIREKTUR ---
         function getDirekturHTML() {
             const depts = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const divs = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
