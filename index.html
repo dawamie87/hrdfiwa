@@ -61,7 +61,7 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen">
 
-    <!-- SIDEBAR (Desktop) -->
+    <!-- SIDEBAR (Desktop) - Sticky Fixed -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-100 mb-2 bg-white z-10">
             <h1 class="text-xl font-bold text-blue-900 flex items-center gap-3">
@@ -241,9 +241,21 @@
         // --- FETCH DATA ---
         async function fetchAllData() {
             if (!API_URL) return;
-            fetchDataGeneric('karyawan', (data) => { dataKaryawan = data; if (currentPage === 'beranda' || currentPage === 'direktur') renderPage(currentPage); });
-            fetchDataGeneric('info', (data) => { dataInfo = data; if (currentPage === 'informasi' || currentPage === 'beranda') renderPage(currentPage); });
-            fetchDataGeneric('ebook', (data) => { dataEbooks = data.map((item, index) => ({ ...item, color: ebookColors[index % ebookColors.length] })); if (currentPage === 'ebook' || currentPage === 'beranda') renderPage(currentPage); });
+            
+            fetchDataGeneric('karyawan', (data) => {
+                dataKaryawan = data;
+                if (currentPage === 'beranda' || currentPage === 'direktur') renderPage(currentPage);
+            });
+
+            fetchDataGeneric('info', (data) => {
+                dataInfo = data;
+                if (currentPage === 'informasi' || currentPage === 'beranda') renderPage(currentPage);
+            });
+
+            fetchDataGeneric('ebook', (data) => {
+                dataEbooks = data.map((item, index) => ({ ...item, color: ebookColors[index % ebookColors.length] }));
+                if (currentPage === 'ebook' || currentPage === 'beranda') renderPage(currentPage);
+            });
         }
 
         async function fetchDataGeneric(type, onSuccess) {
@@ -280,12 +292,30 @@
             content.innerHTML = '';
 
             switch(pageName) {
-                case 'beranda': content.innerHTML = getBerandaHTML(); setTimeout(initDashboardCharts, 100); break;
-                case 'informasi': content.innerHTML = getInformasiHTML(); break;
-                case 'direktur': content.innerHTML = getDirekturHTML(); if (loadingState.karyawan) { document.getElementById('employee-list-container').innerHTML = '<div class="flex flex-col justify-center items-center h-64 text-slate-400"><div class="loader mb-3"></div><p>Memuat Data...</p></div>'; } else { updateEmployeeGrid(); } break;
-                case 'ebook': content.innerHTML = getEbookHTML(); break;
-                case 'hrd': content.innerHTML = getKontakHRDHTML(); break;
-                case 'generator': content.innerHTML = getGeneratorHTML(); break;
+                case 'beranda':
+                    content.innerHTML = getBerandaHTML();
+                    setTimeout(initDashboardCharts, 100); 
+                    break;
+                case 'informasi':
+                    content.innerHTML = getInformasiHTML();
+                    break;
+                case 'direktur':
+                    content.innerHTML = getDirekturHTML();
+                    if (loadingState.karyawan) {
+                        document.getElementById('employee-list-container').innerHTML = '<div class="flex flex-col justify-center items-center h-64 text-slate-400"><div class="loader mb-3"></div><p>Memuat Data Karyawan...</p></div>';
+                    } else {
+                        updateEmployeeGrid();
+                    }
+                    break;
+                case 'ebook':
+                    content.innerHTML = getEbookHTML();
+                    break;
+                case 'hrd':
+                    content.innerHTML = getKontakHRDHTML();
+                    break;
+                case 'generator':
+                    content.innerHTML = getGeneratorHTML();
+                    break;
             }
             lucide.createIcons();
             window.scrollTo(0, 0);
@@ -304,8 +334,7 @@
 
         // --- DASHBOARD ---
         function getBerandaHTML() {
-            // ... (Same as before) ...
-             const totalKaryawan = dataKaryawan.length;
+            const totalKaryawan = dataKaryawan.length;
             const uniqueDivisi = new Set(dataKaryawan.map(d => getProp(d, 'divisi')).filter(Boolean)).size;
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
@@ -334,7 +363,7 @@
             });
 
             const recentInfo = dataInfo.slice(0, 3);
-            
+
             return `
                 <div class="space-y-6">
                     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
@@ -397,13 +426,12 @@
                 </div>`;
         }
 
-        // --- DASHBOARD CHARTS ---
         function initDashboardCharts() {
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
+
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
-            
-            // Division Chart Logic
+
             const divisions = [...new Set(dataKaryawan.map(d => {
                 const val = getProp(d, ['divisi', 'division']);
                 return val ? String(val).trim() : null;
@@ -422,7 +450,6 @@
                 }).length
             );
 
-            // Edu Chart Logic
             const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const normalizeEdu = (edu) => {
                 if (!edu) return 'Lainnya';
@@ -457,7 +484,19 @@
             if (eduChartInstance) eduChartInstance.destroy();
 
             const ctxGender = document.getElementById('genderChart').getContext('2d');
-            genderChartInstance = new Chart(ctxGender, { type: 'doughnut', data: { labels: ['Ikhwan', 'Akhwat'], datasets: [{ data: [totalIkhwan, totalAkhwat], backgroundColor: ['#10b981', '#ec4899'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+            genderChartInstance = new Chart(ctxGender, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ikhwan', 'Akhwat'],
+                    datasets: [{
+                        data: [totalIkhwan, totalAkhwat],
+                        backgroundColor: ['#10b981', '#ec4899'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
+            });
 
             const ctxDiv = document.getElementById('divisionChart').getContext('2d');
             const divChartContainer = document.getElementById('divisionChart').parentNode;
@@ -466,6 +505,114 @@
 
             const ctxEdu = document.getElementById('eduChart').getContext('2d');
             eduChartInstance = new Chart(ctxEdu, { type: 'bar', data: { labels: departments, datasets: eduDatasets }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } }, y: { stacked: true, ticks: { font: { size: 10, weight: '500' } }, grid: { display: false } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, usePointStyle: true } }, tooltip: { callbacks: { footer: (tooltipItems) => { let sum = 0; tooltipItems.forEach(function(tooltipItem) { sum += tooltipItem.parsed.x; }); return 'Total: ' + sum + ' Org'; } } } } } });
+        }
+
+        // --- NEW: GENERATOR TEKS UI ---
+        function getGeneratorHTML() {
+            return `
+                <div class="max-w-2xl mx-auto space-y-6 fade-in">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
+                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
+                                <i data-lucide="wand-2" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-800">Generator Teks Spreadsheet</h2>
+                                <p class="text-xs text-slate-500">Ubah paragraf menjadi format HTML dengan gaya teks.</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Input Teks:</label>
+                                
+                                <!-- Toolbar -->
+                                <div class="flex flex-wrap gap-1 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-lg">
+                                    <button onclick="formatText('b')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Tebal"><i data-lucide="bold" class="w-4 h-4 text-slate-600"></i></button>
+                                    <button onclick="formatText('i')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Miring"><i data-lucide="italic" class="w-4 h-4 text-slate-600"></i></button>
+                                    <button onclick="formatText('u')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Garis Bawah"><i data-lucide="underline" class="w-4 h-4 text-slate-600"></i></button>
+                                    <div class="w-px h-6 bg-slate-300 mx-1 self-center"></div>
+                                    <button onclick="formatText('left')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Rata Kiri"><i data-lucide="align-left" class="w-4 h-4 text-slate-600"></i></button>
+                                    <button onclick="formatText('center')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Rata Tengah"><i data-lucide="align-center" class="w-4 h-4 text-slate-600"></i></button>
+                                    <button onclick="formatText('right')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Rata Kanan"><i data-lucide="align-right" class="w-4 h-4 text-slate-600"></i></button>
+                                    <button onclick="formatText('justify')" class="p-2 hover:bg-white hover:shadow-sm rounded transition" title="Rata Kanan Kiri"><i data-lucide="align-justify" class="w-4 h-4 text-slate-600"></i></button>
+                                </div>
+
+                                <textarea id="genInput" rows="6" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-700 placeholder:text-slate-400 font-mono" placeholder="Ketik teks di sini, lalu blok teks dan klik tombol di atas..."></textarea>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button onclick="runGenerator()" class="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition font-medium text-sm flex items-center justify-center gap-2">
+                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Convert ke HTML
+                                </button>
+                                <button onclick="document.getElementById('genInput').value = ''; document.getElementById('genOutput').value = '';" class="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition font-medium text-sm">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Hasil (Copy ke Google Sheet):</label>
+                                <textarea id="genOutput" rows="4" readonly class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800 cursor-pointer focus:outline-none" onclick="this.select()"></textarea>
+                            </div>
+
+                            <button onclick="copyGenResult()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 transition font-medium text-sm flex items-center justify-center gap-2">
+                                <i data-lucide="copy" class="w-4 h-4"></i> Salin Hasil
+                            </button>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100 text-xs text-blue-800">
+                            <p class="font-bold mb-1 flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Tips:</p>
+                            <ul class="list-disc pl-4 space-y-1 opacity-80">
+                                <li>Gunakan alat ini untuk mengisi kolom <b>detail</b> (Info) atau <b>deskripsi</b> (Ebook).</li>
+                                <li>Hasil convert akan mengganti tombol <b>Enter</b> menjadi kode <code>&lt;br&gt;</code>.</li>
+                                <li>Paste hasil di kolom Google Sheet agar teks di aplikasi rapi berparagraf.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- GENERATOR LOGIC ---
+        function runGenerator() {
+            const input = document.getElementById('genInput').value;
+            if(!input) return;
+            // Replace newline with <br> tag
+            const output = input.replace(/\n/g, '<br>');
+            document.getElementById('genOutput').value = output;
+        }
+
+        function copyGenResult() {
+            const copyText = document.getElementById("genOutput");
+            if(!copyText.value) return;
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                showToast("Teks berhasil disalin!", "bg-emerald-600");
+            });
+        }
+        
+        function formatText(cmd) {
+            const input = document.getElementById('genInput');
+            const start = input.selectionStart;
+            const end = input.selectionEnd;
+            const text = input.value;
+            const selected = text.substring(start, end);
+            
+            if (!selected) return;
+
+            let formatted = '';
+            switch(cmd) {
+                case 'b': formatted = `<b>${selected}</b>`; break;
+                case 'i': formatted = `<i>${selected}</i>`; break;
+                case 'u': formatted = `<u>${selected}</u>`; break;
+                case 'left': formatted = `<div class="text-left">${selected}</div>`; break;
+                case 'center': formatted = `<div class="text-center">${selected}</div>`; break;
+                case 'right': formatted = `<div class="text-right">${selected}</div>`; break;
+                case 'justify': formatted = `<div class="text-justify">${selected}</div>`; break;
+            }
+
+            input.value = text.substring(0, start) + formatted + text.substring(end);
         }
 
         function getInformasiHTML() {
@@ -545,81 +692,6 @@
             lucide.createIcons();
         }
 
-        // --- NEW: GENERATOR TEKS UI ---
-        function getGeneratorHTML() {
-            return `
-                <div class="max-w-2xl mx-auto space-y-6 fade-in">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
-                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
-                                <i data-lucide="wand-2" class="w-5 h-5"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-lg font-bold text-slate-800">Generator Teks Spreadsheet</h2>
-                                <p class="text-xs text-slate-500">Ubah paragraf panjang menjadi format HTML satu baris.</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Input Teks Asli (Bisa Enter):</label>
-                                <textarea id="genInput" rows="6" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-700 placeholder:text-slate-400" placeholder="Ketik atau paste teks panjang di sini..."></textarea>
-                            </div>
-
-                            <div class="flex gap-2">
-                                <button onclick="runGenerator()" class="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition font-medium text-sm flex items-center justify-center gap-2">
-                                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Convert ke HTML
-                                </button>
-                                <button onclick="document.getElementById('genInput').value = ''; document.getElementById('genOutput').value = '';" class="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition font-medium text-sm">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Hasil (Copy ke Google Sheet):</label>
-                                <textarea id="genOutput" rows="4" readonly class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800 cursor-pointer focus:outline-none" onclick="this.select()"></textarea>
-                            </div>
-
-                            <button onclick="copyGenResult()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 transition font-medium text-sm flex items-center justify-center gap-2">
-                                <i data-lucide="copy" class="w-4 h-4"></i> Salin Hasil
-                            </button>
-                        </div>
-
-                        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100 text-xs text-blue-800">
-                            <p class="font-bold mb-1 flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Tips:</p>
-                            <ul class="list-disc pl-4 space-y-1 opacity-80">
-                                <li>Gunakan alat ini untuk mengisi kolom <b>detail</b> (Info) atau <b>deskripsi</b> (Ebook).</li>
-                                <li>Hasil convert akan mengganti tombol <b>Enter</b> menjadi kode <code>&lt;br&gt;</code>.</li>
-                                <li>Paste hasil di kolom Google Sheet agar teks di aplikasi rapi berparagraf.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // --- GENERATOR LOGIC ---
-        function runGenerator() {
-            const input = document.getElementById('genInput').value;
-            if(!input) return;
-            // Replace newline with <br> tag
-            const output = input.replace(/\n/g, '<br>');
-            document.getElementById('genOutput').value = output;
-        }
-
-        function copyGenResult() {
-            const copyText = document.getElementById("genOutput");
-            if(!copyText.value) return;
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); 
-            navigator.clipboard.writeText(copyText.value).then(() => {
-                showToast("Teks berhasil disalin!", "bg-emerald-600");
-            });
-        }
-
-        // --- HANDLERS & MODALS ---
-        // ... (Fungsi switchDirectorTab, handleSearch, handleSort, handleFilter, generateIDCard, openDetail, openInfoDetail, openEbookDetail, window.switchModalTab, closeModal sama seperti sebelumnya) ...
-        
         function getKontakHRDHTML() {
              return `<div class="space-y-6 fade-in"><div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="user-cog" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Kepegawaian</h3><p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p><a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100"><i data-lucide="wallet" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Payroll</h3><p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p><a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div></div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Informasi Kantor</h3></div><div class="p-5 space-y-4"><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Jam Operasional</p><p class="text-xs text-slate-500 mt-0.5">Senin - Jumat, 08.00 - 16.00 WIB</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0"><i data-lucide="map-pin" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Lokasi Kantor</p><p class="text-xs text-slate-500 mt-0.5">Gedung Utama Lt. 2, Ruang 204</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0"><i data-lucide="mail" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Email Resmi</p><p class="text-xs text-slate-500 mt-0.5">hrd@organisasi.id</p></div></div></div></div></div>`;
         }
@@ -659,7 +731,6 @@
             return `<div class="text-center"><div id="id-card-preview" class="w-full max-w-[320px] mx-auto id-card-bg rounded-2xl shadow-xl overflow-hidden text-white relative h-[500px] flex flex-col"><div class="id-card-pattern"></div><div class="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-white/10 rounded-full"></div><div class="p-6 text-center z-10"><h2 class="text-lg font-bold tracking-widest uppercase">Portal Organisasi</h2><p class="text-[10px] opacity-80 tracking-widest">MEMBER CARD</p></div><div class="flex justify-center z-10 mt-2"><div class="w-32 h-32 rounded-full border-4 border-white/30 p-1 bg-white/10 backdrop-blur-sm"><img src="${getDirectDriveUrl(img)}" class="w-full h-full rounded-full object-cover bg-slate-200"></div></div><div class="flex-1 flex flex-col justify-center items-center z-10 p-4"><h1 class="text-xl font-bold mb-1">${name}</h1><p class="text-sm bg-white/20 px-3 py-1 rounded-full font-medium mb-4">${jab}</p><div class="w-full grid grid-cols-2 gap-2 text-xs text-left px-4"><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">ID Number</span><span class="font-mono font-bold">${nip}</span></div><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">Divisi</span><span class="font-bold">${div}</span></div><div class="bg-white/10 p-2 rounded col-span-2"><span class="block opacity-60 text-[9px] uppercase">Bergabung Sejak</span><span class="font-bold">${formatDateIndo(date)}</span></div></div></div><div class="bg-black/20 p-3 text-[10px] text-center z-10">www.portalorganisasi.id</div></div><button onclick="window.print()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"><i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF</button></div>`;
         }
 
-        // UPDATE: OPEN DETAIL WITH NEW FIELDS
         function openDetail(id) {
             const emp = dataKaryawan.find(k => getProp(k, 'id') == id);
             if (!emp) return;
@@ -679,11 +750,8 @@
             const bpjsKes = getProp(emp, ['bpjs_kesehatan', 'bpjs_kes']) || '-';
             const bpjsKet = getProp(emp, ['bpjs_ketenagakerjaan', 'bpjs_tk']) || '-';
             const img = getProp(emp, ['image', 'foto']);
-            
-            // NEW FIELDS
             const status = getProp(emp, ['status_karyawan', 'status', 'employee_status']) || '-';
             const contractEnd = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak', 'contract_end']);
-
             const formattedDate = formatDateIndo(date);
             const duration = hitungMasaKerja(date);
 
@@ -696,14 +764,7 @@
                 <div id="content-info">
                     <div class="flex flex-col items-center text-center mb-6"><img src="${getDirectDriveUrl(img)}" class="w-32 aspect-[3/4] rounded-xl border-4 border-white shadow-lg mb-3 object-cover bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'"><h2 class="text-xl font-bold text-slate-800">${name}, <span class="text-base font-medium text-slate-500">${gelar}</span></h2><p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mt-1">${jab}</p><span class="mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">NIP: ${nip}</span></div>
                     <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Departemen</p><p class="font-medium text-slate-700">${dept}</p></div>
-                            <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Divisi</p><p class="font-medium text-slate-700">${div}</p></div>
-                            <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Jenis Kelamin</p><p class="font-medium text-slate-700 capitalize">${gender}</p></div>
-                            <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Status Karyawan</p><p class="font-medium text-slate-700 capitalize">${status}</p></div>
-                            <div class="p-3 bg-slate-50 rounded-lg col-span-2 sm:col-span-1"><p class="text-xs text-slate-400 mb-1">Tanggal Bergabung</p><p class="font-medium text-slate-700">${formattedDate}</p><p class="text-[10px] text-blue-600 mt-1 bg-blue-50 inline-block px-1.5 py-0.5 rounded border border-blue-100">${duration}</p></div>
-                            ${contractEnd ? `<div class="p-3 bg-slate-50 rounded-lg col-span-2 sm:col-span-1"><p class="text-xs text-slate-400 mb-1">Akhir Kontrak</p><p class="font-medium text-red-600">${formatDateIndo(contractEnd)}</p></div>` : ''}
-                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm"><div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Departemen</p><p class="font-medium text-slate-700">${dept}</p></div><div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Divisi</p><p class="font-medium text-slate-700">${div}</p></div><div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Jenis Kelamin</p><p class="font-medium text-slate-700 capitalize">${gender}</p></div><div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Status Karyawan</p><p class="font-medium text-slate-700 capitalize">${status}</p></div><div class="p-3 bg-slate-50 rounded-lg col-span-2 sm:col-span-1"><p class="text-xs text-slate-400 mb-1">Tanggal Bergabung</p><p class="font-medium text-slate-700">${formattedDate}</p><p class="text-[10px] text-blue-600 mt-1 bg-blue-50 inline-block px-1.5 py-0.5 rounded border border-blue-100">${duration}</p></div>${contractEnd ? `<div class="p-3 bg-slate-50 rounded-lg col-span-2 sm:col-span-1"><p class="text-xs text-slate-400 mb-1">Akhir Kontrak</p><p class="font-medium text-red-600">${formatDateIndo(contractEnd)}</p></div>` : ''}</div>
                         <div class="border-t border-slate-100 pt-4"><h4 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-blue-500"></i> Pendidikan</h4><div class="flex justify-between text-sm"><span class="text-slate-500">Pendidikan Terakhir</span><span class="font-medium text-slate-700 text-right">${edu} - ${eduName}</span></div></div>
                         <div class="border-t border-slate-100 pt-4"><h4 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i> Data BPJS</h4><div class="space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500">BPJS Kesehatan</span><span class="font-mono text-slate-700">${bpjsKes}</span></div><div class="flex justify-between"><span class="text-slate-500">BPJS Ketenagakerjaan</span><span class="font-mono text-slate-700">${bpjsKet}</span></div></div></div>
                     </div>
@@ -718,14 +779,11 @@
             if (!item) return;
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
-            
             const type = getProp(item, ['type', 'jenis', 'kategori']);
             const title = getProp(item, ['title', 'judul']);
             const date = getProp(item, ['date', 'tanggal']);
             const summary = getProp(item, ['summary', 'ringkasan', 'deskripsi_singkat']);
             const detail = getProp(item, ['detail', 'isi', 'konten']) || 'Tidak ada informasi tambahan.';
-            
-            // Handle newlines by replacing with <br>
             const detailHtml = detail.replace(/\n/g, '<br>');
 
             modalContent.innerHTML = `
@@ -742,19 +800,13 @@
             if (!book) return;
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
-            
             const title = getProp(book, ['title', 'judul', 'judul_buku']);
             const author = getProp(book, ['author', 'penulis', 'pengarang']);
             const pages = getProp(book, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman']);
             const desc = getProp(book, ['deskripsi', 'sinopsis', 'ringkasan']) || 'Tidak ada deskripsi.';
             const link = getProp(book, ['link_download', 'link', 'url']);
-            
-            // Handle newlines by replacing with <br>
             const descHtml = desc.replace(/\n/g, '<br>');
-
-            const downloadBtn = link 
-                ? `<a href="${link}" target="_blank" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 font-medium shadow-lg shadow-blue-200"><i data-lucide="download" class="w-5 h-5"></i> Download PDF</a>`
-                : `<button disabled class="w-full bg-slate-300 text-slate-500 py-3 rounded-xl flex items-center justify-center gap-2 font-medium cursor-not-allowed">Link Tidak Tersedia</button>`;
+            const downloadBtn = link ? `<a href="${link}" target="_blank" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 font-medium shadow-lg shadow-blue-200"><i data-lucide="download" class="w-5 h-5"></i> Download PDF</a>` : `<button disabled class="w-full bg-slate-300 text-slate-500 py-3 rounded-xl flex items-center justify-center gap-2 font-medium cursor-not-allowed">Link Tidak Tersedia</button>`;
 
             modalContent.innerHTML = `
                 <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-50"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -770,7 +822,6 @@
             const idCardContent = document.getElementById('content-idcard');
             const tabInfo = document.getElementById('tab-info');
             const tabIdCard = document.getElementById('tab-idcard');
-
             if (tab === 'info') {
                 infoContent.classList.remove('hidden');
                 idCardContent.classList.add('hidden');
