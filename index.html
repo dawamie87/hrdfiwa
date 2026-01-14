@@ -18,19 +18,35 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Sidebar Styling Fixes */
         .sidebar-link {
-            display: flex; align-items: center; gap: 0.75rem; 
-            padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.9rem; font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem; 
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            font-size: 0.9rem; 
+            font-weight: 500;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent; margin-bottom: 0.25rem;
+            border: 1px solid transparent;
+            margin-bottom: 0.25rem;
         }
         .sidebar-active {
-            background-color: #eff6ff; color: #2563eb;
-            border-color: #dbeafe; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            background-color: #eff6ff; /* blue-50 */
+            color: #2563eb; /* blue-600 */
+            border-color: #dbeafe; /* blue-100 */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
-        .sidebar-inactive { color: #64748b; }
-        .sidebar-inactive:hover { background-color: #f8fafc; color: #1e293b; border-color: #e2e8f0; }
+        .sidebar-inactive {
+            color: #64748b; /* slate-500 */
+        }
+        .sidebar-inactive:hover {
+            background-color: #f8fafc;
+            color: #1e293b;
+            border-color: #e2e8f0;
+        }
 
+        /* Nav Mobile Styles */
         .active-tab-nav { color: #2563eb; }
         .active-tab-nav i { fill: #eff6ff; }
         .inactive-tab-nav { color: #94a3b8; }
@@ -45,7 +61,7 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen">
 
-    <!-- SIDEBAR (Desktop) -->
+    <!-- SIDEBAR (Desktop) - Sticky Fixed -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-100 mb-2 bg-white z-10">
             <h1 class="text-xl font-bold text-blue-900 flex items-center gap-3">
@@ -58,24 +74,33 @@
         </div>
         <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
             <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full">
-                <i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span>
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Dashboard</span>
             </button>
             <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="bell-ring" class="w-5 h-5"></i><span class="flex-1 text-left">Pusat Informasi</span>
+                <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Pusat Informasi</span>
             </button>
             <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="users" class="w-5 h-5"></i><span class="flex-1 text-left">Data Karyawan</span>
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Data Karyawan</span>
             </button>
             <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="book-open" class="w-5 h-5"></i><span class="flex-1 text-left">Ebook Panduan</span>
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Ebook Panduan</span>
             </button>
             <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="headset" class="w-5 h-5"></i><span class="flex-1 text-left">Layanan HRD</span>
+                <i data-lucide="headset" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Layanan HRD</span>
             </button>
+            <!-- NEW MENU: Generator -->
             <button onclick="renderPage('generator')" id="sidebar-generator" class="sidebar-link sidebar-inactive w-full">
-                <i data-lucide="wand-2" class="w-5 h-5"></i><span class="flex-1 text-left">Tools Generator</span>
+                <i data-lucide="wand-2" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Tools Generator</span>
             </button>
         </nav>
+        
+        <!-- User Profile Mini -->
         <div class="p-4 border-t border-slate-100 bg-white z-10">
             <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm">
@@ -99,6 +124,7 @@
                     </h1>
                 </div>
                 <div class="hidden md:block">
+                    <!-- Updated Header Text -->
                     <h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2>
                 </div>
                 <div class="flex items-center gap-3">
@@ -132,8 +158,8 @@
         <div class="grid grid-cols-6 h-[4.5rem]">
             <button onclick="renderPage('beranda')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 active-tab-nav" id="nav-beranda"><i data-lucide="home" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Home</span></button>
             <button onclick="renderPage('informasi')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-informasi"><i data-lucide="info" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Info</span></button>
-            <button onclick="renderPage('direktur')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-direktur"><i data-lucide="users" class="w-5 h-5 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Karyawan</span></button>
-            <button onclick="renderPage('ebook')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-ebook"><i data-lucide="book-open" class="w-5 h-5 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Ebook</span></button>
+            <button onclick="renderPage('direktur')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-direktur"><i data-lucide="users" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Karyawan</span></button>
+            <button onclick="renderPage('ebook')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-ebook"><i data-lucide="book-open" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Ebook</span></button>
             <button onclick="renderPage('hrd')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-hrd"><i data-lucide="headset" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">HRD</span></button>
             <button onclick="renderPage('generator')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-generator"><i data-lucide="wand-2" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Tools</span></button>
         </div>
@@ -505,9 +531,51 @@
 
         // --- RENDER & INIT ---
         function getKontakHRDHTML() {
-             return `<div class="space-y-6 fade-in"><div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="user-cog" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Kepegawaian</h3><p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p><a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100"><i data-lucide="wallet" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Payroll</h3><p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p><a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div></div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Informasi Kantor</h3></div><div class="p-5 space-y-4"><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Jam Operasional</p><p class="text-xs text-slate-500 mt-0.5">Senin - Jumat, 08.00 - 16.00 WIB</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0"><i data-lucide="map-pin" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Lokasi Kantor</p><p class="text-xs text-slate-500 mt-0.5">Gedung Utama Lt. 2, Ruang 204</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0"><i data-lucide="mail" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Email Resmi</p><p class="text-xs text-slate-500 mt-0.5">hrd@organisasi.id</p></div></div></div></div></div>`;
+             return `<div class="space-y-6 fade-in"><div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- HR Administrasi -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="file-text" class="w-6 h-6"></i></div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-800">HR Administrasi</h3>
+                        <p class="text-xs text-slate-500 mb-1">Ust. Ahmad Dawami</p>
+                        <p class="text-[10px] text-slate-400 mb-3">Administrasi Umum</p>
+                        <a href="https://wa.me/6285281323336" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
+                    </div>
+                </div>
+                <!-- HR Personalia -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-100"><i data-lucide="users" class="w-6 h-6"></i></div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-800">HR Personalia</h3>
+                        <p class="text-xs text-slate-500 mb-1">Ust. Fadlan</p>
+                        <p class="text-[10px] text-slate-400 mb-3">Kepegawaian & Data</p>
+                        <a href="https://wa.me/6283199950668" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
+                    </div>
+                </div>
+                <!-- HR Recruitment -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 shrink-0 border border-orange-100"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-800">HR Recruitment</h3>
+                        <p class="text-xs text-slate-500 mb-1">Ust. Syahril Maulana</p>
+                        <p class="text-[10px] text-slate-400 mb-3">Rekrutmen & Seleksi</p>
+                        <a href="https://wa.me/6285117460495" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
+                    </div>
+                </div>
+                <!-- HR Generalist Akhwat -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center text-pink-600 shrink-0 border border-pink-100"><i data-lucide="heart-handshake" class="w-6 h-6"></i></div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-slate-800">HR Generalist Akhwat</h3>
+                        <p class="text-xs text-slate-500 mb-1">Usth. Raida Musfira</p>
+                        <p class="text-[10px] text-slate-400 mb-3">Khusus Pegawai Putri</p>
+                        <a href="https://wa.me/6285183252383" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
+                    </div>
+                </div>
+             </div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Informasi Kantor</h3></div><div class="p-5 space-y-4"><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Jam Operasional</p><p class="text-xs text-slate-500 mt-0.5">Senin - Jumat, 08.00 - 16.00 WIB</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0"><i data-lucide="map-pin" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Lokasi Kantor</p><p class="text-xs text-slate-500 mt-0.5">Gedung Utama Lt. 2, Ruang 204</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0"><i data-lucide="mail" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Email Resmi</p><p class="text-xs text-slate-500 mt-0.5">hrd@organisasi.id</p></div></div></div></div></div>`;
         }
 
+        // --- HANDLERS ---
         function switchDirectorTab(tab) {
             currentDirectorTab = tab;
             const btnIkhwan = document.getElementById('btn-ikhwan');
@@ -539,7 +607,7 @@
             const date = getProp(emp, ['tanggal_bergabung', 'join_date']);
             const img = getProp(emp, ['image', 'foto']);
 
-            return `<div class="text-center"><div id="id-card-preview" class="w-full max-w-[320px] mx-auto id-card-bg rounded-2xl shadow-xl overflow-hidden text-white relative h-[500px] flex flex-col"><div class="id-card-pattern"></div><div class="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-white/10 rounded-full"></div><div class="p-6 text-center z-10"><h2 class="text-lg font-bold tracking-widest uppercase">Ma'had FIWA</h2><p class="text-[10px] opacity-80 tracking-widest">MEMBER CARD</p></div><div class="flex justify-center z-10 mt-2"><div class="w-32 h-32 rounded-full border-4 border-white/30 p-1 bg-white/10 backdrop-blur-sm"><img src="${getDirectDriveUrl(img)}" class="w-full h-full rounded-full object-cover bg-slate-200"></div></div><div class="flex-1 flex flex-col justify-center items-center z-10 p-4"><h1 class="text-xl font-bold mb-1">${name}</h1><p class="text-sm bg-white/20 px-3 py-1 rounded-full font-medium mb-4">${jab}</p><div class="w-full grid grid-cols-2 gap-2 text-xs text-left px-4"><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">ID Number</span><span class="font-mono font-bold">${nip}</span></div><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">Divisi</span><span class="font-bold">${div}</span></div><div class="bg-white/10 p-2 rounded col-span-2"><span class="block opacity-60 text-[9px] uppercase">Bergabung Sejak</span><span class="font-bold">${formatDateIndo(date)}</span></div></div></div><div class="bg-black/20 p-3 text-[10px] text-center z-10">Fitrah Islamic World Academy</div></div><button onclick="window.print()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"><i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF</button></div>`;
+            return `<div class="text-center"><div id="id-card-preview" class="w-full max-w-[320px] mx-auto id-card-bg rounded-2xl shadow-xl overflow-hidden text-white relative h-[500px] flex flex-col"><div class="id-card-pattern"></div><div class="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-white/10 rounded-full"></div><div class="p-6 text-center z-10"><h2 class="text-lg font-bold tracking-widest uppercase">Portal Organisasi</h2><p class="text-[10px] opacity-80 tracking-widest">MEMBER CARD</p></div><div class="flex justify-center z-10 mt-2"><div class="w-32 h-32 rounded-full border-4 border-white/30 p-1 bg-white/10 backdrop-blur-sm"><img src="${getDirectDriveUrl(img)}" class="w-full h-full rounded-full object-cover bg-slate-200"></div></div><div class="flex-1 flex flex-col justify-center items-center z-10 p-4"><h1 class="text-xl font-bold mb-1">${name}</h1><p class="text-sm bg-white/20 px-3 py-1 rounded-full font-medium mb-4">${jab}</p><div class="w-full grid grid-cols-2 gap-2 text-xs text-left px-4"><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">ID Number</span><span class="font-mono font-bold">${nip}</span></div><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">Divisi</span><span class="font-bold">${div}</span></div><div class="bg-white/10 p-2 rounded col-span-2"><span class="block opacity-60 text-[9px] uppercase">Bergabung Sejak</span><span class="font-bold">${formatDateIndo(date)}</span></div></div></div><div class="bg-black/20 p-3 text-[10px] text-center z-10">www.portalorganisasi.id</div></div><button onclick="window.print()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"><i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF</button></div>`;
         }
 
         // UPDATE: OPEN DETAIL WITH NEW FIELDS
