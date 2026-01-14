@@ -48,7 +48,7 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen">
 
-    <!-- SIDEBAR (Desktop) -->
+    <!-- SIDEBAR (Desktop) - Sticky Fixed -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-100 mb-2 bg-white z-10">
             <h1 class="text-xl font-bold text-blue-900 flex items-center gap-3">
@@ -60,16 +60,38 @@
             <p class="text-xs text-slate-400 mt-2 pl-12 font-medium tracking-wide">SISTEM TERPADU v2.0</p>
         </div>
         <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
-            <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full"><i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span></button>
-            <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full"><i data-lucide="bell-ring" class="w-5 h-5"></i><span class="flex-1 text-left">Pusat Informasi</span></button>
-            <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full"><i data-lucide="users" class="w-5 h-5"></i><span class="flex-1 text-left">Data Karyawan</span></button>
-            <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full"><i data-lucide="book-open" class="w-5 h-5"></i><span class="flex-1 text-left">Ebook Panduan</span></button>
-            <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full"><i data-lucide="headset" class="w-5 h-5"></i><span class="flex-1 text-left">Layanan HRD</span></button>
+            <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Dashboard</span>
+            </button>
+            <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Pusat Informasi</span>
+            </button>
+            <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Data Karyawan</span>
+            </button>
+            <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Ebook Panduan</span>
+            </button>
+            <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="headset" class="w-5 h-5"></i>
+                <span class="flex-1 text-left">Layanan HRD</span>
+            </button>
         </nav>
+        
+        <!-- User Profile Mini -->
         <div class="p-4 border-t border-slate-100 bg-white z-10">
             <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm"><i data-lucide="user" class="w-5 h-5"></i></div>
-                <div class="min-w-0"><p class="text-sm font-semibold text-slate-700 truncate">Karyawan</p><p class="text-xs text-slate-500 truncate">FIWA Member</p></div>
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-700 truncate">Karyawan</p>
+                    <p class="text-xs text-slate-500 truncate">FIWA Member</p>
+                </div>
             </div>
         </div>
     </aside>
@@ -78,17 +100,30 @@
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative">
         <header class="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:border-none md:bg-transparent md:static">
             <div class="max-w-7xl mx-auto px-4 py-3 md:py-6 flex justify-between items-center">
-                <div class="md:hidden"><h1 class="text-lg font-bold text-blue-900 flex items-center gap-2"><i data-lucide="layout-grid" class="w-5 h-5 text-blue-600"></i> HRD Info</h1></div>
-                <div class="hidden md:block"><h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2></div>
+                <div class="md:hidden">
+                    <h1 class="text-lg font-bold text-blue-900 flex items-center gap-2">
+                        <i data-lucide="layout-grid" class="w-5 h-5 text-blue-600"></i> HRD Info
+                    </h1>
+                </div>
+                <div class="hidden md:block">
+                    <!-- Updated Header Text -->
+                    <h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2>
+                </div>
                 <div class="flex items-center gap-3">
-                    <button id="installPWA" class="hidden text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-medium shadow-md shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2"><i data-lucide="download" class="w-3 h-3"></i> Install App</button>
-                    <button class="p-2 rounded-full hover:bg-white hover:shadow-sm transition text-slate-600 relative"><i data-lucide="bell" class="w-5 h-5"></i><span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border border-white rounded-full"></span></button>
+                    <button id="installPWA" class="hidden text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-medium shadow-md shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2">
+                        <i data-lucide="download" class="w-3 h-3"></i> Install App
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-white hover:shadow-sm transition text-slate-600 relative">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border border-white rounded-full"></span>
+                    </button>
                 </div>
             </div>
         </header>
 
         <main id="app-content" class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8"></main>
 
+        <!-- GLOBAL MODAL -->
         <div id="global-modal" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
@@ -140,16 +175,21 @@
             return null;
         }
 
-        // Helpers standar
+        // --- FORMAT TANGGAL INDONESIA (dd/mm/yyyy) ---
         function formatDateIndo(dateString) {
             if (!dateString) return "-";
             const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString; 
+            
+            // Cek validitas tanggal
+            if (isNaN(date.getTime())) return dateString; // Kembalikan string asli jika gagal parse
+
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
+            
             return `${day}/${month}/${year}`;
         }
+
         function hitungMasaKerja(dateString) {
             if (!dateString) return "";
             let startDate = new Date(dateString);
@@ -208,7 +248,15 @@
                 const response = await fetch(`${API_URL}?type=${type}&t=${new Date().getTime()}`);
                 if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
-                if (Array.isArray(data)) onSuccess(data);
+                
+                if (type === 'info' && data.length > 0 && (data[0].nip || data[0].nama_lengkap)) {
+                    console.warn(`Warning: Data ${type} salah.`);
+                    return; 
+                }
+
+                if (Array.isArray(data)) {
+                    onSuccess(data);
+                }
             } catch (e) {
                 console.error(`Gagal memuat ${type}:`, e);
             } finally {
@@ -375,6 +423,7 @@
                 </div>`;
         }
 
+        // --- DASHBOARD CHARTS ---
         function initDashboardCharts() {
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
 
@@ -383,25 +432,40 @@
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
 
             // 2. Chart Gender per Divisi (Stacked Bar)
-            const divisions = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
+            // Use set to extract unique, non-null, trimmed division names
+            const divisions = [...new Set(dataKaryawan.map(d => {
+                const val = getProp(d, ['divisi', 'division']);
+                return val ? String(val).trim() : null;
+            }).filter(Boolean))].sort();
+
             const malePerDiv = divisions.map(div => 
-                dataKaryawan.filter(d => getProp(d, ['divisi', 'division']) === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length
+                dataKaryawan.filter(d => {
+                    const empDiv = getProp(d, ['divisi', 'division']);
+                    return empDiv && String(empDiv).trim() === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan';
+                }).length
             );
+            
             const femalePerDiv = divisions.map(div => 
-                dataKaryawan.filter(d => getProp(d, ['divisi', 'division']) === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length
+                dataKaryawan.filter(d => {
+                    const empDiv = getProp(d, ['divisi', 'division']);
+                    return empDiv && String(empDiv).trim() === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat';
+                }).length
             );
 
-            // 3. Chart Education (Grouped)
+            // 3. Chart Education (Grouped & Simplified)
             const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             
+            // Helper: Grouping Education Levels
             const normalizeEdu = (edu) => {
                 if (!edu) return 'Lainnya';
                 edu = String(edu).toUpperCase().trim();
+                
                 if (['S3', 'S2', 'DOKTOR', 'MASTER', 'PASCA', 'PHD', 'M.', 'DR.'].some(k => edu.includes(k))) return 'Pascasarjana';
                 if (['S1', 'D4', 'SARJANA', 'BACHELOR', 'S.K', 'S.P', 'S.E', 'S.T', 'S.S'].some(k => edu.includes(k) || edu === 'S1')) return 'Sarjana';
                 if (['D3', 'D2', 'D1', 'DIPLOMA', 'A.MD'].some(k => edu.includes(k))) return 'Diploma';
                 if (['SMA', 'SMK', 'MA', 'SLTA', 'STM', 'SMEA'].some(k => edu.includes(k))) return 'SMA/K';
                 if (['SMP', 'MTS', 'SLTP', 'SD', 'MI'].some(k => edu.includes(k))) return 'Dasar';
+                
                 return 'Lainnya';
             };
 
@@ -445,8 +509,18 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } }
             });
 
-            // Render 2: Division Gender Stacked Bar (NEW)
+            // Render 2: Division Gender Stacked Bar (NEW) - Show all divisions
             const ctxDiv = document.getElementById('divisionChart').getContext('2d');
+            
+            // Adjust container height based on number of divisions to ensure readability
+            // Assuming approx 20px per bar/division. 
+            // We need to change the height of the container in the DOM, or let Chart.js handle scrolling (complex).
+            // A simpler way is to update the canvas container style height dynamically.
+            const divChartContainer = document.getElementById('divisionChart').parentNode;
+            if (divisions.length > 10) {
+                 divChartContainer.style.height = (divisions.length * 25 + 50) + 'px'; // Dynamic height
+            }
+
             divisionChartInstance = new Chart(ctxDiv, {
                 type: 'bar',
                 data: {
@@ -460,7 +534,16 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     indexAxis: 'y',
-                    scales: { x: { stacked: true }, y: { stacked: true, ticks: { font: { size: 10 } } } },
+                    scales: { 
+                        x: { stacked: true }, 
+                        y: { 
+                            stacked: true, 
+                            ticks: { 
+                                font: { size: 10 },
+                                autoSkip: false // Force show all labels
+                            } 
+                        } 
+                    },
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
                 }
             });
