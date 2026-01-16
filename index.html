@@ -75,26 +75,6 @@
         .calendar-event-dot { position: absolute; bottom: 3px; width: 4px; height: 4px; border-radius: 50%; }
         .calendar-today { background-color: #2563eb; color: white; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
         .calendar-today .calendar-event-dot { background-color: white; }
-
-        /* Tree View (Org Chart) Styles */
-        .tree ul { padding-top: 20px; position: relative; transition: all 0.5s; -webkit-transition: all 0.5s; -moz-transition: all 0.5s; display: flex; justify-content: center; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; transition: all 0.5s; -webkit-transition: all 0.5s; -moz-transition: all 0.5s; }
-        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 1px solid #ccc; width: 50%; height: 20px; }
-        .tree li::after { right: auto; left: 50%; border-left: 1px solid #ccc; }
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 1px solid #ccc; border-radius: 0 5px 0 0; }
-        .tree li:first-child::after { border-radius: 5px 0 0 0; }
-        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 1px solid #ccc; width: 0; height: 20px; }
-        .tree-node { display: inline-block; padding: 10px; text-decoration: none; background: #fff; color: #666; border: 1px solid #ccc; font-size: 11px; border-radius: 8px; transition: all 0.5s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); min-width: 120px; }
-        .tree-node:hover { background: #eef2ff; color: #000; border: 1px solid #94a3b8; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .tree-node-header { font-weight: bold; color: #1e293b; display: block; margin-bottom: 2px; }
-        .tree-node-sub { font-size: 9px; color: #94a3b8; }
-        body.dark-mode .tree-node { background: #1e293b; color: #cbd5e1; border-color: #475569; }
-        body.dark-mode .tree-node:hover { background: #334155; color: #fff; }
-        body.dark-mode .tree-node-header { color: #f1f5f9; }
-        body.dark-mode .tree li::before, body.dark-mode .tree li::after, body.dark-mode .tree ul ul::before { border-color: #475569; }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen selection:bg-blue-100 selection:text-blue-700">
@@ -262,8 +242,8 @@
         let loadingState = { karyawan: false, info: false, ebook: false, agenda: false };
         let isOfflineMode = false;
         let isDarkMode = false;
-        let viewModeDirektur = 'list'; // 'list' or 'tree'
-        
+        let clockInterval = null;
+
         const ebookColors = ["bg-emerald-100 text-emerald-600", "bg-blue-100 text-blue-600", "bg-purple-100 text-purple-600", "bg-orange-100 text-orange-600", "bg-pink-100 text-pink-600", "bg-indigo-100 text-indigo-600"];
         
         let currentPage = 'beranda';
@@ -287,24 +267,43 @@
             return null;
         }
 
-        // DATE PARSER for dd/mm/yyyy
+        // DATE PARSER (Improved for Indonesian Months)
         function parseDate(dateInput) {
             if (!dateInput) return null;
             if (dateInput instanceof Date) return dateInput;
             
-            // Check for dd/mm/yyyy format
-            // Allow / or - as separator
-            const dmy = String(dateInput).match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            const str = String(dateInput).trim();
+
+            // 1. Try standard ISO/Date parsing
+            let d = new Date(str);
+            if (!isNaN(d.getTime())) return d;
+
+            // 2. Handle dd/mm/yyyy or dd-mm-yyyy
+            const dmy = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
             if (dmy) {
-                // new Date(year, monthIndex, day)
-                // dmy[3] = year, dmy[2] = month, dmy[1] = day
-                // Note: monthIndex is 0-11
                 return new Date(dmy[3], parseInt(dmy[2]) - 1, dmy[1]);
             }
-            
-            // Try standard Date parsing for other formats (ISO, etc.)
-            const d = new Date(dateInput);
-            if (!isNaN(d.getTime())) return d;
+
+            // 3. Handle Indonesian Format: "19 Januari 2026" or "19 Jan 2026"
+            const indoMonths = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
+            const shortIndoMonths = ["jan", "feb", "mar", "apr", "mei", "jun", "jul", "agu", "sep", "okt", "nov", "des"];
+
+            // Regex allows space, dash or slash separators
+            const textMatch = str.match(/^(\d{1,2})[\s\-\/]+([a-zA-Z]+)[\s\-\/]+(\d{4})$/);
+            if (textMatch) {
+                const day = parseInt(textMatch[1]);
+                const monthStr = textMatch[2].toLowerCase();
+                const year = parseInt(textMatch[3]);
+                
+                let monthIndex = indoMonths.indexOf(monthStr);
+                if (monthIndex === -1) {
+                     monthIndex = shortIndoMonths.indexOf(monthStr);
+                }
+
+                if (monthIndex !== -1) {
+                    return new Date(year, monthIndex, day);
+                }
+            }
             
             return null;
         }
@@ -446,10 +445,44 @@
                 const currentMonth = new Date().getMonth();
                 const birthDateThisMonth = `${currentYear-25}-${String(currentMonth+1).padStart(2,'0')}-15`;
                 return [
-                    { id: 1, nama_lengkap: "Ahmad Fulan", nip: "EMP001", divisi: "IT", departemen: "Teknologi", jabatan: "Senior Developer", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2020-01-15", tanggal_lahir: "1990-05-12", tanggal_akhir_kontrak: "2025-01-15", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" },
-                    { id: 2, nama_lengkap: "Siti Fulana", nip: "EMP002", divisi: "HRD", departemen: "Umum", jabatan: "HR Manager", jenis_kelamin: "Akhwat", tanggal_bergabung: "2019-05-20", tanggal_lahir: birthDateThisMonth, tanggal_akhir_kontrak: "2026-05-20", image: "", pendidikan_terakhir: "S2", status_karyawan: "Tetap" },
-                    { id: 3, nama_lengkap: "Budi Santoso", nip: "EMP003", divisi: "Marketing", departemen: "Bisnis", jabatan: "Staff Marketing", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2023-08-01", tanggal_lahir: "1995-12-03", tanggal_akhir_kontrak: "2024-08-01", image: "", pendidikan_terakhir: "D3", status_karyawan: "Kontrak" },
-                    { id: 4, nama_lengkap: "Dewi Sartika", nip: "EMP004", divisi: "Finance", departemen: "Keuangan", jabatan: "Staff Finance", jenis_kelamin: "Akhwat", tanggal_bergabung: "2022-03-10", tanggal_lahir: birthDateThisMonth, tanggal_akhir_kontrak: "2025-03-10", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" }
+                    { 
+                        id: 1, 
+                        nama_lengkap: "Ahmad Fulan", 
+                        nip: "EMP001", 
+                        divisi: "IT", 
+                        departemen: "Teknologi", 
+                        jabatan: "Senior Developer", 
+                        jenis_kelamin: "Ikhwan", 
+                        tanggal_bergabung: "2020-01-15", 
+                        tanggal_lahir: "1990-05-12",
+                        tempat_lahir: "Jakarta",
+                        no_hp: "08123456789",
+                        email: "ahmad@contoh.com",
+                        status_pernikahan: "Menikah",
+                        tanggal_akhir_kontrak: "2025-01-15", 
+                        image: "", 
+                        pendidikan_terakhir: "S1", 
+                        status_karyawan: "Tetap" 
+                    },
+                    { 
+                        id: 2, 
+                        nama_lengkap: "Siti Fulana", 
+                        nip: "EMP002", 
+                        divisi: "HRD", 
+                        departemen: "Umum", 
+                        jabatan: "HR Manager", 
+                        jenis_kelamin: "Akhwat", 
+                        tanggal_bergabung: "2019-05-20", 
+                        tanggal_lahir: birthDateThisMonth,
+                        tempat_lahir: "Bogor",
+                        no_hp: "08129876543",
+                        email: "siti@contoh.com",
+                        status_pernikahan: "Belum Menikah",
+                        tanggal_akhir_kontrak: "2026-05-20", 
+                        image: "", 
+                        pendidikan_terakhir: "S2", 
+                        status_karyawan: "Tetap" 
+                    }
                 ];
             } else if (type === 'info') {
                 return [
@@ -584,26 +617,19 @@
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const expiringNextMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === nextMonth.getMonth() && expDate.getFullYear() === nextMonth.getFullYear(); });
             
-            const birthdaysThisMonth = dataKaryawan.filter(d => {
-                const dobVal = getProp(d, ['tanggal_lahir', 'dob', 'birth_date']);
-                if(!dobVal) return false;
-                const dob = parseDate(dobVal);
-                return dob && dob.getMonth() === currentMonth;
-            }).sort((a,b) => {
-                const dateA = parseDate(getProp(a, ['tanggal_lahir'])).getDate();
-                const dateB = parseDate(getProp(b, ['tanggal_lahir'])).getDate();
-                return dateA - dateB;
-            });
-
             const recentInfo = dataInfo.slice(0, 3);
             const calendarHTML = generateCalendarHTML();
             
-            // Sort agendas by date (closest first)
-            const sortedAgendas = [...dataAgenda].sort((a, b) => {
+            // Filter agendas: Only show dates >= today
+            const todayMidnight = new Date();
+            todayMidnight.setHours(0,0,0,0);
+            
+            const upcomingAgendas = dataAgenda.filter(agenda => {
+                const agDate = parseDate(getProp(agenda, ['date', 'tanggal']));
+                return agDate && agDate >= todayMidnight;
+            }).sort((a, b) => {
                 const dateA = parseDate(getProp(a, ['date', 'tanggal']));
                 const dateB = parseDate(getProp(b, ['date', 'tanggal']));
-                if (!dateA) return 1;
-                if (!dateB) return -1;
                 return dateA - dateB;
             });
 
@@ -708,15 +734,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-pink-500"></i> Ulang Tahun Bulan Ini</h3>
-                            <span class="bg-pink-100 text-pink-700 text-xs px-2 py-0.5 rounded-full font-bold">${birthdaysThisMonth.length}</span>
-                        </div>
-                        <div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">
-                            ${birthdaysThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada yang berulang tahun bulan ini.</p>' : birthdaysThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const dob = parseDate(getProp(emp, ['tanggal_lahir', 'dob'])); const dateStr = `${dob.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][dob.getMonth()]}`; const isToday = dob.getDate() === now.getDate(); return `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100 ${isToday ? 'bg-pink-50 border-pink-100' : ''}"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><div class="text-right"><span class="text-xs font-bold text-pink-600 block">${dateStr}</span>${isToday ? '<span class="text-[8px] bg-pink-600 text-white px-1.5 py-0.5 rounded-full">HARI INI!</span>' : ''}</div></div>` }).join('')}
-                        </div>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4 text-blue-500"></i> Info Terbaru</h3>
                             <button onclick="renderPage('informasi')" class="text-[10px] text-blue-600 font-bold hover:underline">Lihat Semua</button>
                         </div>
@@ -726,35 +743,37 @@
                     </div>
                     
                     <!-- CALENDAR AND AGENDA (NEW) -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full lg:col-span-2">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender & Agenda</h3>
                         
-                        <!-- Calendar Widget -->
-                        <div class="mb-4">
-                            ${calendarHTML}
-                        </div>
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- Calendar Widget -->
+                            <div class="flex-1">
+                                ${calendarHTML}
+                            </div>
 
-                        <!-- Agenda List (Scrollable) -->
-                        <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t border-slate-100 pt-3">
-                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Agenda Mendatang</h4>
-                            ${sortedAgendas.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda.</p>' : 
-                            sortedAgendas.map(agenda => {
-                                const agDate = parseDate(getProp(agenda, ['date', 'tanggal']));
-                                if (!agDate) return '';
-                                const isPast = agDate < new Date().setHours(0,0,0,0);
-                                return `
-                                <div class="flex gap-3 mb-3 last:mb-0 group">
-                                    <div class="flex flex-col items-center min-w-[2.5rem]">
-                                        <span class="text-[10px] font-bold ${isPast ? 'text-slate-400' : 'text-blue-600'} uppercase">${agDate.toLocaleString('id-ID', { month: 'short' })}</span>
-                                        <span class="text-lg font-bold ${isPast ? 'text-slate-400' : 'text-slate-800'} leading-none">${agDate.getDate()}</span>
-                                    </div>
-                                    <div class="flex-1 pb-3 border-b border-slate-50 last:border-0">
-                                        <h5 class="text-xs font-bold ${isPast ? 'text-slate-500' : 'text-slate-700'} mb-0.5">${getProp(agenda, ['title', 'judul'])}</h5>
-                                        <p class="text-[10px] text-slate-400 line-clamp-1">${getProp(agenda, ['description', 'deskripsi'])}</p>
-                                        <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded ${isPast ? 'bg-slate-100 text-slate-400' : 'bg-indigo-50 text-indigo-600 font-medium'}">${getProp(agenda, ['type', 'category', 'kategori'])}</span>
-                                    </div>
-                                </div>`
-                            }).join('')}
+                            <!-- Agenda List (Scrollable) -->
+                            <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-4 max-h-64">
+                                <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Agenda Mendatang</h4>
+                                ${upcomingAgendas.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda mendatang.</p>' : 
+                                upcomingAgendas.map(agenda => {
+                                    const agDate = parseDate(getProp(agenda, ['date', 'tanggal']));
+                                    if (!agDate) return '';
+                                    
+                                    return `
+                                    <div class="flex gap-3 mb-3 last:mb-0 group">
+                                        <div class="flex flex-col items-center min-w-[2.5rem]">
+                                            <span class="text-[10px] font-bold text-blue-600 uppercase">${agDate.toLocaleString('id-ID', { month: 'short' })}</span>
+                                            <span class="text-lg font-bold text-slate-800 leading-none">${agDate.getDate()}</span>
+                                        </div>
+                                        <div class="flex-1 pb-3 border-b border-slate-50 last:border-0">
+                                            <h5 class="text-xs font-bold text-slate-700 mb-0.5">${getProp(agenda, ['title', 'judul'])}</h5>
+                                            <p class="text-[10px] text-slate-400 line-clamp-1">${getProp(agenda, ['description', 'deskripsi'])}</p>
+                                            <span class="inline-block mt-1 text-[9px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 font-medium">${getProp(agenda, ['type', 'category', 'kategori'])}</span>
+                                        </div>
+                                    </div>`
+                                }).join('')}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -899,7 +918,7 @@
             </div>`;
         }
 
-        // --- DIRECTORY SECTION (Updated with Org Chart Toggle) ---
+        // --- DIRECTORY SECTION (Updated: Structure Removed) ---
         function getDirekturHTML() {
             const depts = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const divs = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
@@ -913,18 +932,6 @@
                     <p class="text-sm text-slate-500">Direktori lengkap pegawai & direksi</p>
                 </div>
                 
-                <div class="flex justify-between items-center bg-slate-200/50 p-1.5 rounded-xl max-w-full overflow-x-auto">
-                    <div class="flex gap-1">
-                        <button onclick="toggleViewMode('list')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${viewModeDirektur === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
-                            <i data-lucide="list" class="w-4 h-4"></i> List
-                        </button>
-                        <button onclick="toggleViewMode('tree')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${viewModeDirektur === 'tree' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
-                            <i data-lucide="network" class="w-4 h-4"></i> Struktur
-                        </button>
-                    </div>
-                </div>
-
-                ${viewModeDirektur === 'list' ? `
                 <div class="space-y-4 fade-in">
                     <div class="bg-slate-100 p-2 rounded-xl flex gap-2">
                         <button id="btn-ikhwan" onclick="switchDirectorTab('ikhwan')" class="flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentDirectorTab === 'ikhwan' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}"><i data-lucide="user" class="w-4 h-4"></i> Ikhwan</button>
@@ -937,34 +944,10 @@
                     </div>
                 </div>
                 <div id="employee-list-container" class="fade-in min-h-[300px]"></div>
-                ` : `
-                <div id="org-chart-container" class="fade-in overflow-x-auto pb-10 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="tree w-full">
-                        <ul>
-                            <li>
-                                <div class="tree-node font-bold bg-blue-50 border-blue-200 text-blue-800">
-                                    <span class="tree-node-header text-sm">Direktur Utama</span>
-                                    <span class="tree-node-sub">Pimpinan</span>
-                                </div>
-                                <ul id="tree-root"></ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                `}
             </div>`;
         }
 
-        function toggleViewMode(mode) {
-            viewModeDirektur = mode;
-            renderPage('direktur');
-        }
-
         function updateEmployeeGrid() {
-            if(viewModeDirektur === 'tree') {
-                renderOrgChart();
-                return;
-            }
             const container = document.getElementById('employee-list-container');
             if (!container) return;
             const isMatch = (dataGender, tabGender) => normalizeGender(dataGender) === tabGender;
@@ -1001,49 +984,6 @@
             }
             container.innerHTML = contentHTML;
             lucide.createIcons();
-        }
-
-        function renderOrgChart() {
-            const container = document.getElementById('tree-root');
-            if(!container) return;
-            
-            // Group by Dept -> Div -> Employees
-            const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department']) || 'Umum'))].sort();
-            
-            let html = '';
-            departments.forEach(dept => {
-                const employeesInDept = dataKaryawan.filter(d => (getProp(d, ['departemen', 'department']) || 'Umum') === dept);
-                const divisions = [...new Set(employeesInDept.map(d => getProp(d, ['divisi', 'division']) || 'General'))].sort();
-                
-                html += `
-                <li>
-                    <a href="#" class="tree-node font-semibold bg-indigo-50 border-indigo-100">
-                        <span class="tree-node-header">${dept}</span>
-                        <span class="tree-node-sub">${employeesInDept.length} Orang</span>
-                    </a>
-                    <ul>`;
-                    
-                divisions.forEach(div => {
-                    const emps = employeesInDept.filter(d => (getProp(d, ['divisi', 'division']) || 'General') === div);
-                    html += `
-                    <li>
-                        <a href="#" class="tree-node bg-white">
-                            <span class="tree-node-header text-blue-600">${div}</span>
-                            <span class="tree-node-sub">${emps.length} Staff</span>
-                        </a>
-                        <ul>`;
-                        
-                        emps.forEach(emp => {
-                             const name = getProp(emp, ['nama_lengkap', 'name']);
-                             html += `<li><a href="javascript:void(0)" onclick="openDetail('${getProp(emp, 'id')}')" class="tree-node hover:bg-slate-50"><div class="w-8 h-8 rounded-full overflow-hidden mx-auto mb-1 border border-slate-200"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-full h-full object-cover"></div><span class="tree-node-header text-[10px] whitespace-normal">${name}</span></a></li>`;
-                        });
-                        
-                    html += `</ul></li>`;
-                });
-                
-                html += `</ul></li>`;
-            });
-            container.innerHTML = html;
         }
 
         function getGeneratorHTML() {
@@ -1231,7 +1171,7 @@
                          `Mohon persetujuannya. Terima kasih.`;
 
             // Open WhatsApp (Replace generic number with placeholder logic if needed, currently using dummy)
-            const waNumber = "6281234567890"; 
+            const waNumber = "6285281323336"; 
             window.open(`https://wa.me/${waNumber}?text=${text}`, '_blank');
             closeModal();
         }
@@ -1406,7 +1346,7 @@
                         <div class="flex-1">
                             <h3 class="font-bold text-slate-800">Admin Payroll</h3>
                             <p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p>
-                            <a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto shadow-md shadow-emerald-200"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
+                            <a href="https://wa.me/6285281323336" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto shadow-md shadow-emerald-200"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
                         </div>
                     </div>
                 </div>
