@@ -298,6 +298,16 @@
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         }
+
+        function formatDateLongIndo(dateString) {
+            const date = parseDate(dateString);
+            if (!date || isNaN(date.getTime())) return "-";
+            const day = date.getDate();
+            const indoMonths = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const month = indoMonths[date.getMonth()];
+            const year = date.getFullYear();
+            return `${day} ${month} ${year}`;
+        }
         
         function hitungMasaKerja(dateString) {
             const startDate = parseDate(dateString);
@@ -594,7 +604,14 @@
             
             const now = new Date();
             const currentMonth = now.getMonth();
-            const newJoiners = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_bergabung', 'join_date']); if(!dateVal) return false; const joinDate = parseDate(dateVal); return joinDate && joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear(); });
+            
+            // Logic change: Latest Joiners (Top 5 latest dates) instead of This Month Only
+            const newJoiners = [...dataKaryawan].sort((a, b) => {
+                const dateA = parseDate(getProp(a, ['tanggal_bergabung', 'join_date']));
+                const dateB = parseDate(getProp(b, ['tanggal_bergabung', 'join_date']));
+                return (dateB || 0) - (dateA || 0); // Descending
+            }).slice(0, 5);
+
             const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const expiringNextMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === nextMonth.getMonth() && expDate.getFullYear() === nextMonth.getFullYear(); });
@@ -714,6 +731,33 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                     <!-- Karyawan Terbaru (NEW LOGIC) -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i> Karyawan Terbaru</h3>
+                            <span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">${newJoiners.length}</span>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">
+                            ${newJoiners.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada karyawan baru.</p>' : newJoiners.map(emp => { 
+                                const name = getProp(emp, ['nama_lengkap', 'nama']); 
+                                const div = getProp(emp, ['divisi', 'division']); 
+                                const joinDate = getProp(emp, ['tanggal_bergabung', 'join_date']);
+                                return `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100">
+                                    <img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-slate-800 truncate">${name}</p>
+                                        <p class="text-[10px] text-slate-500 truncate">${div}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] text-slate-400 block">${formatDateIndo(joinDate)}</span>
+                                        <span class="text-[9px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-medium">Baru</span>
+                                    </div>
+                                </div>` 
+                            }).join('')}
+                        </div>
+                    </div>
+
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4 text-blue-500"></i> Info Terbaru</h3>
@@ -725,17 +769,17 @@
                     </div>
                     
                     <!-- CALENDAR AND AGENDA (NEW) -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full lg:col-span-2">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full lg:col-span-1">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender & Agenda</h3>
                         
-                        <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex flex-col gap-6">
                             <!-- Calendar Widget -->
                             <div class="flex-1">
                                 ${calendarHTML}
                             </div>
 
                             <!-- Agenda List (Scrollable) -->
-                            <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-4 max-h-64">
+                            <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t border-slate-100 pt-3 max-h-48">
                                 <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Agenda Mendatang</h4>
                                 ${upcomingAgendas.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda mendatang.</p>' : 
                                 upcomingAgendas.map(agenda => {
@@ -835,7 +879,6 @@
             eduChartInstance = new Chart(ctxEdu, { type: 'bar', data: { labels: departments, datasets: eduDatasets }, options: { ...commonOptions, indexAxis: 'y', scales: { x: { stacked: true, ticks: {color: textColor} }, y: { stacked: true, ticks: {color: textColor} } } } });
         }
 
-        // --- EXPANDED FUNCTIONS (Fix for ReferenceError) ---
         function getInformasiHTML() {
             if (loadingState.info) return '<div class="flex justify-center p-10"><div class="loader"></div></div>';
             if (dataInfo.length === 0) return '<div class="text-center p-10 text-slate-400">Belum ada informasi.</div>';
@@ -1177,7 +1220,7 @@
             const statusNikah = getProp(emp, ['status_pernikahan', 'marital_status']) || '-';
             const tempatLahir = getProp(emp, ['tempat_lahir', 'birth_place']) || '';
             const tglLahir = getProp(emp, ['tanggal_lahir', 'dob']);
-            const ttl = (tempatLahir ? tempatLahir + ', ' : '') + (tglLahir ? formatDateIndo(tglLahir) : '-');
+            const ttl = (tempatLahir ? tempatLahir + ', ' : '') + (tglLahir ? formatDateLongIndo(tglLahir) : '-');
 
             modalContent.innerHTML = `
                 <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-50"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -1194,7 +1237,7 @@
                             <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><i data-lucide="user-check" class="w-4 h-4"></i> Data Pribadi</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div><p class="text-xs text-slate-400 mb-0.5">No. Handphone</p>
-                                     <a href="https://wa.me/${String(noHp).replace(/^0/,'62').replace(/\D/g,'')}" target="_blank" class="font-medium text-blue-600 hover:underline flex items-center gap-1">${noHp} <i data-lucide="external-link" class="w-3 h-3"></i></a>
+                                     <span class="font-medium text-slate-700">${noHp}</span>
                                 </div>
                                 <div><p class="text-xs text-slate-400 mb-0.5">Email</p>
                                      <a href="mailto:${email}" class="font-medium text-slate-700 hover:text-blue-600 truncate block">${email}</a>
