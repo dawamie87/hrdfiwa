@@ -16,8 +16,28 @@
     
     <style>
         /* Base Styles */
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-font-smoothing: antialiased; transition: background-color 0.3s, color 0.3s; }
         
+        /* Dark Mode Styles */
+        body.dark-mode { background-color: #0f172a; color: #f8fafc; }
+        body.dark-mode .bg-white { background-color: #1e293b; }
+        body.dark-mode .text-slate-800 { color: #f1f5f9; }
+        body.dark-mode .text-slate-700 { color: #e2e8f0; }
+        body.dark-mode .text-slate-600 { color: #cbd5e1; }
+        body.dark-mode .text-slate-500 { color: #94a3b8; }
+        body.dark-mode .text-slate-400 { color: #64748b; }
+        body.dark-mode .bg-slate-50 { background-color: #0f172a; }
+        body.dark-mode .bg-slate-100 { background-color: #334155; }
+        body.dark-mode .bg-slate-200 { background-color: #475569; }
+        body.dark-mode .border-slate-100 { border-color: #334155; }
+        body.dark-mode .border-slate-200 { border-color: #475569; }
+        body.dark-mode aside { background-color: #1e293b; border-right-color: #334155; }
+        body.dark-mode header.bg-white\/90 { background-color: rgba(30, 41, 59, 0.9); border-bottom-color: #334155; }
+        body.dark-mode .sidebar-active { background-color: #1e3a8a; color: #60a5fa; border-color: #1d4ed8; }
+        body.dark-mode .sidebar-inactive:hover { background-color: #334155; color: #f1f5f9; }
+        body.dark-mode nav.md\:hidden { background-color: #1e293b; border-top-color: #334155; }
+        body.dark-mode .id-card-bg { background-image: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+
         /* Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -55,6 +75,26 @@
         .calendar-event::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background-color: #2563eb; border-radius: 50%; }
         .calendar-today { background-color: #2563eb; color: white; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
         .calendar-today::after { background-color: white; }
+
+        /* Tree View (Org Chart) Styles */
+        .tree ul { padding-top: 20px; position: relative; transition: all 0.5s; -webkit-transition: all 0.5s; -moz-transition: all 0.5s; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; transition: all 0.5s; -webkit-transition: all 0.5s; -moz-transition: all 0.5s; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 1px solid #ccc; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 1px solid #ccc; }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 1px solid #ccc; border-radius: 0 5px 0 0; }
+        .tree li:first-child::after { border-radius: 5px 0 0 0; }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 1px solid #ccc; width: 0; height: 20px; }
+        .tree-node { display: inline-block; padding: 10px; text-decoration: none; background: #fff; color: #666; border: 1px solid #ccc; font-size: 11px; border-radius: 8px; transition: all 0.5s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); min-width: 120px; }
+        .tree-node:hover { background: #eef2ff; color: #000; border: 1px solid #94a3b8; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tree-node-header { font-weight: bold; color: #1e293b; display: block; margin-bottom: 2px; }
+        .tree-node-sub { font-size: 9px; color: #94a3b8; }
+        body.dark-mode .tree-node { background: #1e293b; color: #cbd5e1; border-color: #475569; }
+        body.dark-mode .tree-node:hover { background: #334155; color: #fff; }
+        body.dark-mode .tree-node-header { color: #f1f5f9; }
+        body.dark-mode .tree li::before, body.dark-mode .tree li::after, body.dark-mode .tree ul ul::before { border-color: #475569; }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen selection:bg-blue-100 selection:text-blue-700">
@@ -62,7 +102,7 @@
     <!-- SIDEBAR (Desktop) -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
         <!-- LOGO HEADER -->
-        <div class="px-6 py-6 border-b border-slate-100 mb-2 bg-white z-10">
+        <div class="px-6 py-6 border-b border-slate-100 mb-2 bg-white z-10 transition-colors">
             <div class="flex items-center gap-3.5 select-none">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200 ring-2 ring-blue-50 ring-offset-1 transform hover:scale-105 transition-transform duration-300">
                     <i data-lucide="layout-grid" class="w-6 h-6 stroke-[1.5]"></i>
@@ -96,8 +136,19 @@
             </button>
         </nav>
 
-        <!-- PROFILE WIDGET -->
-        <div class="p-4 border-t border-slate-100 bg-white z-10">
+        <!-- PROFILE & DARK MODE WIDGET -->
+        <div class="p-4 border-t border-slate-100 bg-white z-10 transition-colors space-y-3">
+            <!-- Dark Mode Toggle -->
+            <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition text-slate-600">
+                <div class="flex items-center gap-2 text-sm font-medium">
+                    <i data-lucide="moon" class="w-4 h-4"></i>
+                    <span>Mode Gelap</span>
+                </div>
+                <div class="w-8 h-4 bg-slate-300 rounded-full relative transition-colors duration-300" id="darkModeSwitchBg">
+                    <div class="w-3 h-3 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform duration-300 shadow-sm" id="darkModeSwitchKnob"></div>
+                </div>
+            </button>
+
             <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer group">
                 <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm group-hover:scale-105 transition">
                     <i data-lucide="user" class="w-5 h-5"></i>
@@ -112,9 +163,9 @@
     </aside>
 
     <!-- MAIN CONTENT -->
-    <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative">
+    <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative transition-colors">
         <!-- HEADER (Mobile Only) -->
-        <header class="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:hidden">
+        <header class="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:hidden transition-colors">
             <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md">
@@ -123,6 +174,9 @@
                     <h1 class="text-lg font-bold text-slate-800 tracking-tight">HRD Portal</h1>
                 </div>
                 <div class="flex items-center gap-3">
+                     <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600">
+                        <i data-lucide="moon" class="w-5 h-5"></i>
+                    </button>
                      <button class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600 relative">
                         <i data-lucide="bell" class="w-5 h-5"></i>
                         <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
@@ -143,7 +197,7 @@
                         <i data-lucide="download" class="w-3 h-3"></i> Install App
                     </button>
                     <div class="h-8 w-px bg-slate-200 mx-2"></div>
-                    <p class="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm" id="date-display">
+                    <p class="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm transition-colors" id="date-display">
                         <!-- JS Date will go here -->
                         Memuat tanggal...
                     </p>
@@ -157,7 +211,7 @@
         <div id="global-modal" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
-                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all scale-100 relative">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto pointer-events-auto transform transition-all scale-100 relative" id="modal-panel">
                     <div id="modal-content" class="p-6"></div>
                 </div>
             </div>
@@ -168,7 +222,7 @@
     </div>
 
     <!-- MOBILE NAVIGATION (Bottom Bar) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)] transition-colors">
         <div class="grid grid-cols-5 h-[4rem]"> 
             <button onclick="renderPage('beranda')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 active-tab-nav" id="nav-beranda">
                 <i data-lucide="home" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Home</span>
@@ -196,7 +250,7 @@
                 </div>
             </button>
         </div>
-        <div class="h-safe w-full bg-white"></div> 
+        <div class="h-safe w-full bg-white transition-colors"></div> 
     </nav>
 
     <script>
@@ -207,6 +261,10 @@
         let dataKaryawan = [], dataInfo = [], dataEbooks = [];
         let loadingState = { karyawan: false, info: false, ebook: false };
         let isOfflineMode = false;
+        let isDarkMode = false;
+        let viewModeDirektur = 'list'; // 'list' or 'tree'
+        let attendanceStatus = localStorage.getItem('attendanceStatus') || 'out'; // 'in' or 'out'
+        let clockInterval = null;
 
         const ebookColors = ["bg-emerald-100 text-emerald-600", "bg-blue-100 text-blue-600", "bg-purple-100 text-purple-600", "bg-orange-100 text-orange-600", "bg-pink-100 text-pink-600", "bg-indigo-100 text-indigo-600"];
         
@@ -275,14 +333,103 @@
             return url;
         }
 
+        // --- DARK MODE LOGIC ---
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            const body = document.body;
+            const knob = document.getElementById('darkModeSwitchKnob');
+            const bg = document.getElementById('darkModeSwitchBg');
+            
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+                if(knob && bg) {
+                    knob.style.transform = 'translateX(100%)';
+                    bg.className = "w-8 h-4 bg-blue-600 rounded-full relative transition-colors duration-300";
+                }
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+                if(knob && bg) {
+                    knob.style.transform = 'translateX(0)';
+                    bg.className = "w-8 h-4 bg-slate-300 rounded-full relative transition-colors duration-300";
+                }
+            }
+            if(currentPage === 'beranda') setTimeout(initDashboardCharts, 100);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                isDarkMode = true;
+                document.body.classList.add('dark-mode');
+                const knob = document.getElementById('darkModeSwitchKnob');
+                const bg = document.getElementById('darkModeSwitchBg');
+                if(knob && bg) {
+                    knob.style.transform = 'translateX(100%)';
+                    bg.className = "w-8 h-4 bg-blue-600 rounded-full relative transition-colors duration-300";
+                }
+            }
+        }
+
+        // --- ATTENDANCE LOGIC (NEW) ---
+        function initClock() {
+            const clockEl = document.getElementById('live-clock');
+            if(clockEl) {
+                if(clockInterval) clearInterval(clockInterval);
+                const update = () => {
+                    clockEl.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' WIB';
+                };
+                update();
+                clockInterval = setInterval(update, 1000);
+            }
+        }
+
+        function handleAttendance(type) {
+            if (!navigator.geolocation) {
+                showToast("Browser tidak mendukung lokasi.", "bg-red-600");
+                return;
+            }
+            
+            // Validate sequence
+            if (type === 'Masuk' && attendanceStatus === 'in') { showToast("Anda sudah Absen Masuk hari ini.", "bg-orange-500"); return; }
+            if (type === 'Pulang' && attendanceStatus === 'out') { showToast("Anda belum Absen Masuk.", "bg-orange-500"); return; }
+
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loader w-4 h-4 border-2"></div> Memproses...';
+
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const long = pos.coords.longitude;
+                const time = new Date().toLocaleTimeString('id-ID');
+                
+                // Simulate success
+                setTimeout(() => {
+                    showToast(`Berhasil Absen ${type}! Pukul ${time}`, "bg-emerald-600");
+                    attendanceStatus = type === 'Masuk' ? 'in' : 'out';
+                    localStorage.setItem('attendanceStatus', attendanceStatus);
+                    renderPage('beranda'); // Refresh UI
+                }, 1000);
+            }, (err) => {
+                showToast("Gagal mengambil lokasi: " + err.message, "bg-red-600");
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+            }, { enableHighAccuracy: true, timeout: 10000 });
+        }
+
         // --- MOCK DATA GENERATOR (FALLBACK) ---
         function getMockData(type) {
             if (type === 'karyawan') {
+                const currentYear = new Date().getFullYear();
+                const currentMonth = new Date().getMonth();
+                const birthDateThisMonth = `${currentYear-25}-${String(currentMonth+1).padStart(2,'0')}-15`;
                 return [
-                    { id: 1, nama_lengkap: "Ahmad Fulan", nip: "EMP001", divisi: "IT", departemen: "Teknologi", jabatan: "Senior Developer", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2020-01-15", tanggal_akhir_kontrak: "2025-01-15", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" },
-                    { id: 2, nama_lengkap: "Siti Fulana", nip: "EMP002", divisi: "HRD", departemen: "Umum", jabatan: "HR Manager", jenis_kelamin: "Akhwat", tanggal_bergabung: "2019-05-20", tanggal_akhir_kontrak: "2026-05-20", image: "", pendidikan_terakhir: "S2", status_karyawan: "Tetap" },
-                    { id: 3, nama_lengkap: "Budi Santoso", nip: "EMP003", divisi: "Marketing", departemen: "Bisnis", jabatan: "Staff Marketing", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2023-08-01", tanggal_akhir_kontrak: "2024-08-01", image: "", pendidikan_terakhir: "D3", status_karyawan: "Kontrak" },
-                    { id: 4, nama_lengkap: "Dewi Sartika", nip: "EMP004", divisi: "Finance", departemen: "Keuangan", jabatan: "Staff Finance", jenis_kelamin: "Akhwat", tanggal_bergabung: "2022-03-10", tanggal_akhir_kontrak: "2025-03-10", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" }
+                    { id: 1, nama_lengkap: "Ahmad Fulan", nip: "EMP001", divisi: "IT", departemen: "Teknologi", jabatan: "Senior Developer", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2020-01-15", tanggal_lahir: "1990-05-12", tanggal_akhir_kontrak: "2025-01-15", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" },
+                    { id: 2, nama_lengkap: "Siti Fulana", nip: "EMP002", divisi: "HRD", departemen: "Umum", jabatan: "HR Manager", jenis_kelamin: "Akhwat", tanggal_bergabung: "2019-05-20", tanggal_lahir: birthDateThisMonth, tanggal_akhir_kontrak: "2026-05-20", image: "", pendidikan_terakhir: "S2", status_karyawan: "Tetap" },
+                    { id: 3, nama_lengkap: "Budi Santoso", nip: "EMP003", divisi: "Marketing", departemen: "Bisnis", jabatan: "Staff Marketing", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2023-08-01", tanggal_lahir: "1995-12-03", tanggal_akhir_kontrak: "2024-08-01", image: "", pendidikan_terakhir: "D3", status_karyawan: "Kontrak" },
+                    { id: 4, nama_lengkap: "Dewi Sartika", nip: "EMP004", divisi: "Finance", departemen: "Keuangan", jabatan: "Staff Finance", jenis_kelamin: "Akhwat", tanggal_bergabung: "2022-03-10", tanggal_lahir: birthDateThisMonth, tanggal_akhir_kontrak: "2025-03-10", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" }
                 ];
             } else if (type === 'info') {
                 return [
@@ -324,7 +471,7 @@
             loadingState[type] = true;
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 sec timeout
+                const timeoutId = setTimeout(() => controller.abort(), 8000); 
                 const response = await fetch(`${API_URL}?type=${type}&t=${new Date().getTime()}`, { signal: controller.signal });
                 clearTimeout(timeoutId);
                 if (!response.ok) throw new Error("Network error");
@@ -362,7 +509,13 @@
             const content = document.getElementById('app-content');
             content.innerHTML = ''; 
             switch(pageName) {
-                case 'beranda': content.innerHTML = getBerandaHTML(); setTimeout(initDashboardCharts, 100); break;
+                case 'beranda': 
+                    content.innerHTML = getBerandaHTML(); 
+                    setTimeout(() => {
+                        initDashboardCharts();
+                        initClock(); // Init clock widget
+                    }, 100); 
+                    break;
                 case 'informasi': content.innerHTML = getInformasiHTML(); break;
                 case 'direktur': 
                     content.innerHTML = getDirekturHTML(); 
@@ -374,6 +527,7 @@
                 case 'generator': content.innerHTML = getGeneratorHTML(); break;
             }
             lucide.createIcons();
+            initTheme(); 
             window.scrollTo(0, 0);
         }
 
@@ -393,37 +547,147 @@
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
             
             const now = new Date();
+            const currentMonth = now.getMonth();
             const newJoiners = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_bergabung', 'join_date']); if(!dateVal) return false; const joinDate = new Date(dateVal); return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear(); });
-            
             const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = new Date(dateVal); return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
-            
-            // Re-added Expiring Next Month Logic
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const expiringNextMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = new Date(dateVal); return expDate.getMonth() === nextMonth.getMonth() && expDate.getFullYear() === nextMonth.getFullYear(); });
             
+            const birthdaysThisMonth = dataKaryawan.filter(d => {
+                const dobVal = getProp(d, ['tanggal_lahir', 'dob', 'birth_date']);
+                if(!dobVal) return false;
+                const dob = new Date(dobVal);
+                return dob.getMonth() === currentMonth;
+            }).sort((a,b) => {
+                const dateA = new Date(getProp(a, ['tanggal_lahir'])).getDate();
+                const dateB = new Date(getProp(b, ['tanggal_lahir'])).getDate();
+                return dateA - dateB;
+            });
+
             const recentInfo = dataInfo.slice(0, 3);
-            const calendarHTML = generateCalendarHTML(); // Ensure this is used
+            const calendarHTML = generateCalendarHTML();
 
-            return `<div class="space-y-6"><div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Dashboard Karyawan</h2><p class="text-blue-100 text-sm">Ringkasan data statistik kepegawaian periode ini.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="users" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalKaryawan}</h3><p class="text-xs text-slate-500">Total Karyawan</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="building-2" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${uniqueDivisi}</h3><p class="text-xs text-slate-500">Total Divisi</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalIkhwan}</h3><p class="text-xs text-slate-500">Ikhwan (L)</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalAkhwat}</h3><p class="text-xs text-slate-500">Akhwat (P)</p></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3><div class="relative h-64 flex justify-center"><canvas id="genderChart"></canvas></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi</h3><div class="relative h-64 w-full"><canvas id="divisionChart"></canvas></div></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3><div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div></div>
+            // Logic for attendance buttons style
+            const btnInClass = attendanceStatus === 'in' ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200';
+            const btnOutClass = attendanceStatus === 'out' ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200';
+
+            return `<div class="space-y-6">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h2 class="text-2xl font-bold mb-1">Dashboard Karyawan</h2>
+                        <p class="text-blue-100 text-sm">Ringkasan data statistik kepegawaian periode ini.</p>
+                    </div>
+                    <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div>
+                </div>
+
+                <!-- ATTENDANCE WIDGET (NEW) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                    <!-- Decor -->
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-full -mr-10 -mt-10 opacity-50 pointer-events-none"></div>
+                    
+                    <div class="flex items-center gap-4 z-10">
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <i data-lucide="clock" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">Absensi Harian</h2>
+                            <p class="text-slate-500 text-xs font-mono mt-1" id="live-clock">--:--:-- WIB</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 w-full md:w-auto z-10">
+                        <button onclick="handleAttendance('Masuk')" ${attendanceStatus === 'in' ? 'disabled' : ''} class="flex-1 md:flex-none py-3 px-6 rounded-xl font-bold transition flex items-center justify-center gap-2 ${btnInClass}">
+                            <i data-lucide="log-in" class="w-4 h-4"></i> Masuk
+                        </button>
+                        <button onclick="handleAttendance('Pulang')" ${attendanceStatus === 'out' ? 'disabled' : ''} class="flex-1 md:flex-none py-3 px-6 rounded-xl font-bold transition flex items-center justify-center gap-2 ${btnOutClass}">
+                            <i data-lucide="log-out" class="w-4 h-4"></i> Pulang
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="users" class="w-5 h-5"></i></div>
+                        <h3 class="text-2xl font-bold text-slate-800">${totalKaryawan}</h3><p class="text-xs text-slate-500">Total Karyawan</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="building-2" class="w-5 h-5"></i></div>
+                        <h3 class="text-2xl font-bold text-slate-800">${uniqueDivisi}</h3><p class="text-xs text-slate-500">Total Divisi</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div>
+                        <h3 class="text-2xl font-bold text-slate-800">${totalIkhwan}</h3><p class="text-xs text-slate-500">Ikhwan (L)</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+                        <div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div>
+                        <h3 class="text-2xl font-bold text-slate-800">${totalAkhwat}</h3><p class="text-xs text-slate-500">Akhwat (P)</p>
+                    </div>
+                </div>
+
+                <!-- Charts Area -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3>
+                        <div class="relative h-64 flex justify-center"><canvas id="genderChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi</h3>
+                        <div class="relative h-64 w-full"><canvas id="divisionChart"></canvas></div>
+                    </div>
+                </div>
+                
+                <!-- Education Chart -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3>
+                    <div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div>
+                </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Habis Kontrak Bulan Ini -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-x" class="w-4 h-4 text-red-500"></i> Habis Kontrak Bulan Ini</h3><span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringThisMonth.length}</span></div><div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">${expiringThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan ini.</p>' : expiringThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}</div></div>
-                
-                <!-- Habis Kontrak Bulan Depan (RESTORED) -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-clock" class="w-4 h-4 text-orange-500"></i> Habis Kontrak Bulan Depan</h3><span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringNextMonth.length}</span></div><div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">${expiringNextMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan depan.</p>' : expiringNextMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}</div></div>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-x" class="w-4 h-4 text-red-500"></i> Habis Kontrak Bulan Ini</h3>
+                            <span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringThisMonth.length}</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+                            ${expiringThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan ini.</p>' : expiringThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-clock" class="w-4 h-4 text-orange-500"></i> Habis Kontrak Bulan Depan</h3>
+                            <span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringNextMonth.length}</span>
+                        </div>
+                        <div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">
+                            ${expiringNextMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan depan.</p>' : expiringNextMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}
+                        </div>
+                    </div>
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                 <!-- Bergabung Bulan Ini -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i> Bergabung Bulan Ini</h3><span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">${newJoiners.length}</span></div><div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">${newJoiners.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada karyawan baru bulan ini.</p>' : newJoiners.map(emp => `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${getProp(emp,['nama_lengkap','nama'])}</p><p class="text-[10px] text-slate-500 truncate">${getProp(emp,['divisi','division'])} • ${getProp(emp,['jabatan','position'])}</p></div><span class="text-[10px] text-slate-400">${formatDateIndo(getProp(emp,['tanggal_bergabung','join_date']))}</span></div>`).join('')}</div></div>
-                
-                 <!-- Recent Info (RESTORED) -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4 text-blue-500"></i> Info Terbaru</h3><button onclick="renderPage('informasi')" class="text-[10px] text-blue-600 font-bold hover:underline">Lihat Semua</button></div><div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">${recentInfo.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada informasi.</p>' : recentInfo.map(item => { const type = getProp(item, ['type', 'jenis', 'kategori']) || 'Info'; const date = getProp(item, ['date', 'tanggal']); const title = getProp(item, ['title', 'judul']); return `<div onclick="openInfoDetail('${getProp(item, 'id')}')" class="p-3 border rounded-lg hover:bg-slate-50 cursor-pointer"><div class="flex justify-between"><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${type}</span><span class="text-[10px] text-slate-400">${formatDateIndo(date)}</span></div><h4 class="text-sm font-bold text-slate-800 mt-1 truncate">${title}</h4></div>` }).join('')}</div></div>
-                
-                <!-- Calendar (RESTORED) -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender Kegiatan</h3>${calendarHTML}</div>
-            </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="cake" class="w-4 h-4 text-pink-500"></i> Ulang Tahun Bulan Ini</h3>
+                            <span class="bg-pink-100 text-pink-700 text-xs px-2 py-0.5 rounded-full font-bold">${birthdaysThisMonth.length}</span>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">
+                            ${birthdaysThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada yang berulang tahun bulan ini.</p>' : birthdaysThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const dob = new Date(getProp(emp, ['tanggal_lahir', 'dob'])); const dateStr = `${dob.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][dob.getMonth()]}`; const isToday = dob.getDate() === now.getDate(); return `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100 ${isToday ? 'bg-pink-50 border-pink-100' : ''}"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><div class="text-right"><span class="text-xs font-bold text-pink-600 block">${dateStr}</span>${isToday ? '<span class="text-[8px] bg-pink-600 text-white px-1.5 py-0.5 rounded-full">HARI INI!</span>' : ''}</div></div>` }).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4 text-blue-500"></i> Info Terbaru</h3>
+                            <button onclick="renderPage('informasi')" class="text-[10px] text-blue-600 font-bold hover:underline">Lihat Semua</button>
+                        </div>
+                        <div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">
+                            ${recentInfo.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada informasi.</p>' : recentInfo.map(item => { const type = getProp(item, ['type', 'jenis', 'kategori']) || 'Info'; const date = getProp(item, ['date', 'tanggal']); const title = getProp(item, ['title', 'judul']); return `<div onclick="openInfoDetail('${getProp(item, 'id')}')" class="p-3 border rounded-lg hover:bg-slate-50 cursor-pointer"><div class="flex justify-between"><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${type}</span><span class="text-[10px] text-slate-400">${formatDateIndo(date)}</span></div><h4 class="text-sm font-bold text-slate-800 mt-1 truncate">${title}</h4></div>` }).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender Kegiatan</h3>
+                        ${calendarHTML}
+                    </div>
+                </div>
             </div>`;
         }
 
@@ -435,13 +699,9 @@
             const firstDay = new Date(year, month, 1).getDay(); 
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = now.getDate();
-            // Assuming dataInfo has dates for events
             const eventDates = dataInfo.map(item => { const d = new Date(getProp(item, ['date', 'tanggal'])); if (!isNaN(d.getTime()) && d.getMonth() === month && d.getFullYear() === year) return d.getDate(); return null; }).filter(Boolean);
-            
             let html = `<div class="text-center mb-4 text-sm font-bold text-slate-600 bg-slate-50 py-2 rounded-lg">${monthNames[month]} ${year}</div><div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide"><div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div></div><div class="grid grid-cols-7 gap-1 text-center text-xs">`;
-            
             for (let i = 0; i < firstDay; i++) html += `<div></div>`;
-            
             for (let day = 1; day <= daysInMonth; day++) { 
                 let classes = "calendar-day hover:bg-blue-50 transition cursor-default font-medium text-slate-600"; 
                 if (day === today) classes += " calendar-today"; 
@@ -454,80 +714,102 @@
 
         function initDashboardCharts() {
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
-            
-            // Gender & Division Stats
+            const textColor = isDarkMode ? '#cbd5e1' : '#64748b'; 
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
             const divisions = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division']) ? String(getProp(d, ['divisi', 'division'])).trim() : null).filter(Boolean))].sort();
             const malePerDiv = divisions.map(div => dataKaryawan.filter(d => { const dDiv = getProp(d, ['divisi', 'division']); return dDiv && String(dDiv).trim() === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan'; }).length);
             const femalePerDiv = divisions.map(div => dataKaryawan.filter(d => { const dDiv = getProp(d, ['divisi', 'division']); return dDiv && String(dDiv).trim() === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat'; }).length);
-
-            // Education Stats
             const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const normalizeEdu = (edu) => { if (!edu) return 'Lainnya'; edu = String(edu).toUpperCase().trim(); if (['S3', 'S2', 'DOKTOR', 'MASTER', 'PASCA'].some(k => edu.includes(k))) return 'Pascasarjana'; if (['S1', 'D4', 'SARJANA', 'BACHELOR'].some(k => edu.includes(k) || edu === 'S1')) return 'Sarjana'; if (['D3', 'D2', 'D1', 'DIPLOMA'].some(k => edu.includes(k))) return 'Diploma'; if (['SMA', 'SMK', 'MA'].some(k => edu.includes(k))) return 'SMA/K'; if (['SMP', 'SD'].some(k => edu.includes(k))) return 'Dasar'; return 'Lainnya'; };
             const eduGroups = ['Pascasarjana', 'Sarjana', 'Diploma', 'SMA/K', 'Dasar', 'Lainnya'];
             const eduColors = { 'Pascasarjana': '#1e3a8a', 'Sarjana': '#2563eb', 'Diploma': '#60a5fa', 'SMA/K': '#94a3b8', 'Dasar': '#cbd5e1', 'Lainnya': '#e2e8f0' };
             const eduDatasets = eduGroups.map((group) => { return { label: group, data: departments.map(dept => dataKaryawan.filter(d => { const empDept = getProp(d, ['departemen', 'department']); const empEdu = getProp(d, ['pendidikan_terakhir', 'education']); return empDept === dept && normalizeEdu(empEdu) === group; }).length), backgroundColor: eduColors[group], barPercentage: 0.6, categoryPercentage: 0.8 }; });
 
-            // Cleanup
             if (genderChartInstance) genderChartInstance.destroy();
             if (divisionChartInstance) divisionChartInstance.destroy();
             if (eduChartInstance) eduChartInstance.destroy();
 
-            // Render 1: Gender
+            const commonOptions = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, color: textColor } } }, scales: { x: { ticks: { color: textColor }, grid: { color: isDarkMode ? '#334155' : '#f1f5f9' } }, y: { ticks: { color: textColor }, grid: { color: isDarkMode ? '#334155' : '#f1f5f9' } } } };
             const ctxGender = document.getElementById('genderChart').getContext('2d');
-            genderChartInstance = new Chart(ctxGender, { type: 'doughnut', data: { labels: ['Ikhwan', 'Akhwat'], datasets: [{ data: [totalIkhwan, totalAkhwat], backgroundColor: ['#10b981', '#ec4899'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
-            
-            // Render 2: Division
+            genderChartInstance = new Chart(ctxGender, { type: 'doughnut', data: { labels: ['Ikhwan', 'Akhwat'], datasets: [{ data: [totalIkhwan, totalAkhwat], backgroundColor: ['#10b981', '#ec4899'], borderWidth: 0, hoverOffset: 4 }] }, options: { ...commonOptions, scales: {} } });
             const ctxDiv = document.getElementById('divisionChart').getContext('2d');
             const divChartContainer = document.getElementById('divisionChart').parentNode;
             if (divisions.length > 0) { const newHeight = Math.max(300, (divisions.length * 25 + 50)); divChartContainer.style.height = newHeight + 'px'; }
-            divisionChartInstance = new Chart(ctxDiv, { type: 'bar', data: { labels: divisions, datasets: [ { label: 'Ikhwan', data: malePerDiv, backgroundColor: '#10b981', stack: 'Stack 0' }, { label: 'Akhwat', data: femalePerDiv, backgroundColor: '#ec4899', stack: 'Stack 0' } ] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { stacked: true }, y: { stacked: true, ticks: { font: { size: 10 }, autoSkip: false } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
-
-            // Render 3: Education (RESTORED)
+            divisionChartInstance = new Chart(ctxDiv, { type: 'bar', data: { labels: divisions, datasets: [ { label: 'Ikhwan', data: malePerDiv, backgroundColor: '#10b981', stack: 'Stack 0' }, { label: 'Akhwat', data: femalePerDiv, backgroundColor: '#ec4899', stack: 'Stack 0' } ] }, options: { ...commonOptions, indexAxis: 'y', scales: { x: { stacked: true, ticks: {color: textColor} }, y: { stacked: true, ticks: {color: textColor} } } } });
             const ctxEdu = document.getElementById('eduChart').getContext('2d');
-            eduChartInstance = new Chart(ctxEdu, { type: 'bar', data: { labels: departments, datasets: eduDatasets }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } }, y: { stacked: true, ticks: { font: { size: 10, weight: '500' } }, grid: { display: false } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, usePointStyle: true } }, tooltip: { callbacks: { footer: (tooltipItems) => { let sum = 0; tooltipItems.forEach(function(tooltipItem) { sum += tooltipItem.parsed.x; }); return 'Total: ' + sum + ' Org'; } } } } } });
+            eduChartInstance = new Chart(ctxEdu, { type: 'bar', data: { labels: departments, datasets: eduDatasets }, options: { ...commonOptions, indexAxis: 'y', scales: { x: { stacked: true, ticks: {color: textColor} }, y: { stacked: true, ticks: {color: textColor} } } } });
         }
 
-        // --- INFO & EBOOK SECTIONS ---
-        function getInformasiHTML() {
-            if (loadingState.info) return '<div class="flex justify-center p-10"><div class="loader"></div></div>';
-            if (dataInfo.length === 0) return '<div class="text-center p-10 text-slate-400">Belum ada informasi.</div>';
-            const listHTML = dataInfo.map(item => {
-                const type = getProp(item, ['type', 'jenis', 'kategori']) || 'Info';
-                const date = getProp(item, ['date', 'tanggal']);
-                const title = getProp(item, ['title', 'judul']);
-                const summary = getProp(item, ['summary', 'ringkasan', 'deskripsi_singkat']) || '';
-                const id = getProp(item, 'id');
-                return `<div onclick="openInfoDetail('${id}')" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group cursor-pointer"><div class="flex justify-between items-start mb-3"><span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">${type}</span><span class="text-xs text-slate-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${formatDateIndo(date)}</span></div><h3 class="font-bold text-slate-800 mb-2 text-base">${title}</h3><p class="text-sm text-slate-500 leading-relaxed line-clamp-2">${summary}</p></div>`;
-            }).join('');
-            return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="info" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Pusat Informasi</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
-        }
+        function getInformasiHTML() { /* ... existing code ... */ return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-blue-100 text-blue-600 rounded-lg"><i data-lucide="info" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Pusat Informasi</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${dataInfo.map(item => `<div onclick="openInfoDetail('${getProp(item, 'id')}')" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition group cursor-pointer"><div class="flex justify-between items-start mb-3"><span class="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">${getProp(item, ['type', 'jenis', 'kategori']) || 'Info'}</span><span class="text-xs text-slate-400 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${formatDateIndo(getProp(item, ['date', 'tanggal']))}</span></div><h3 class="font-bold text-slate-800 mb-2 text-base">${getProp(item, ['title', 'judul'])}</h3><p class="text-sm text-slate-500 leading-relaxed line-clamp-2">${getProp(item, ['summary', 'ringkasan', 'deskripsi_singkat']) || ''}</p></div>`).join('')}</div></div>`; }
+        function getEbookHTML() { /* ... existing code ... */ return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="library" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Ebook Panduan</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${dataEbooks.map(ebook => `<div onclick="openEbookDetail('${getProp(ebook, 'id')}')" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex gap-4 items-center group cursor-pointer hover:border-blue-400 hover:shadow-md transition"><div class="w-16 h-20 shrink-0 ${ebook.color} rounded-lg flex items-center justify-center shadow-inner"><i data-lucide="book" class="w-8 h-8 opacity-80"></i></div><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 text-sm mb-1 truncate group-hover:text-blue-600 transition">${getProp(ebook, ['title', 'judul', 'judul_buku'])}</h3><p class="text-xs text-slate-500 mb-3">Oleh: ${getProp(ebook, ['author', 'penulis', 'pengarang'])}</p><div class="flex items-center justify-between"><span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">${getProp(ebook, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman'])} Hal</span><button class="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition"><i data-lucide="download" class="w-3 h-3"></i> Detail</button></div></div></div>`).join('')}</div></div>`; }
 
-        function getEbookHTML() {
-            if (loadingState.ebook) return '<div class="flex justify-center p-10"><div class="loader"></div></div>';
-            if (dataEbooks.length === 0) return '<div class="text-center p-10 text-slate-400">Belum ada Ebook.</div>';
-            const listHTML = dataEbooks.map(ebook => {
-                const title = getProp(ebook, ['title', 'judul', 'judul_buku']);
-                const author = getProp(ebook, ['author', 'penulis', 'pengarang']);
-                const pages = getProp(ebook, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman']);
-                const id = getProp(ebook, 'id');
-                return `<div onclick="openEbookDetail('${id}')" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex gap-4 items-center group cursor-pointer hover:border-blue-400 hover:shadow-md transition"><div class="w-16 h-20 shrink-0 ${ebook.color} rounded-lg flex items-center justify-center shadow-inner"><i data-lucide="book" class="w-8 h-8 opacity-80"></i></div><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 text-sm mb-1 truncate group-hover:text-blue-600 transition">${title}</h3><p class="text-xs text-slate-500 mb-3">Oleh: ${author}</p><div class="flex items-center justify-between"><span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">${pages} Hal</span><button class="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition"><i data-lucide="download" class="w-3 h-3"></i> Detail</button></div></div></div>`;
-            }).join('');
-            return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="library" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Ebook Panduan</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
-        }
-
-        // --- DIRECTORY SECTION (Reverted to Original) ---
+        // --- DIRECTORY SECTION (Updated with Org Chart Toggle) ---
         function getDirekturHTML() {
             const depts = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const divs = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
             const deptOptions = depts.map(d => `<option value="${d}" ${filterDept === d ? 'selected' : ''}>${d}</option>`).join('');
             const divOptions = divs.map(d => `<option value="${d}" ${filterDiv === d ? 'selected' : ''}>${d}</option>`).join('');
 
-            return `<div class="space-y-6"><div class="md:hidden text-center mb-6"><h2 class="text-xl font-bold text-slate-800">Data Karyawan</h2><p class="text-sm text-slate-500">Direktori lengkap pegawai & direksi</p></div><div class="space-y-4"><div class="bg-slate-200/50 p-1.5 rounded-xl flex gap-1 max-w-md mx-auto md:mx-0"><button id="btn-ikhwan" onclick="switchDirectorTab('ikhwan')" class="flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentDirectorTab === 'ikhwan' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}"><i data-lucide="user" class="w-4 h-4"></i> Ikhwan</button><button id="btn-akhwat" onclick="switchDirectorTab('akhwat')" class="flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentDirectorTab === 'akhwat' ? 'bg-white text-pink-600 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}"><i data-lucide="user" class="w-4 h-4"></i> Akhwat</button></div><div class="flex flex-wrap items-center gap-2 text-sm"><div class="relative flex-1 min-w-[150px]"><i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i><input type="text" id="searchInput" placeholder="Cari..." oninput="handleSearch(this.value)" value="${searchKeyword}" class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm placeholder:text-slate-400"></div><div class="relative w-auto"><select onchange="handleSort(this.value)" class="pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm cursor-pointer appearance-none"><option value="name_asc" ${sortOrder === 'name_asc' ? 'selected' : ''}>A-Z</option><option value="name_desc" ${sortOrder === 'name_desc' ? 'selected' : ''}>Z-A</option><option value="date_new" ${sortOrder === 'date_new' ? 'selected' : ''}>Baru</option></select><i data-lucide="arrow-up-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div><div class="relative w-auto min-w-[100px] max-w-[150px]"><select onchange="handleFilter('dept', this.value)" class="w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none truncate"><option value="">Dept: Semua</option>${deptOptions}</select><i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div><div class="relative w-auto min-w-[100px] max-w-[150px]"><select onchange="handleFilter('div', this.value)" class="w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none truncate"><option value="">Div: Semua</option>${divOptions}</select><i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div></div></div><div id="employee-list-container" class="fade-in min-h-[300px]"></div></div>`;
+            return `
+            <div class="space-y-6">
+                <div class="md:hidden text-center mb-6">
+                    <h2 class="text-xl font-bold text-slate-800">Data Karyawan</h2>
+                    <p class="text-sm text-slate-500">Direktori lengkap pegawai & direksi</p>
+                </div>
+                
+                <div class="flex justify-between items-center bg-slate-200/50 p-1.5 rounded-xl max-w-full overflow-x-auto">
+                    <div class="flex gap-1">
+                        <button onclick="toggleViewMode('list')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${viewModeDirektur === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
+                            <i data-lucide="list" class="w-4 h-4"></i> List
+                        </button>
+                        <button onclick="toggleViewMode('tree')" class="px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${viewModeDirektur === 'tree' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}">
+                            <i data-lucide="network" class="w-4 h-4"></i> Struktur
+                        </button>
+                    </div>
+                </div>
+
+                ${viewModeDirektur === 'list' ? `
+                <div class="space-y-4 fade-in">
+                    <div class="bg-slate-100 p-2 rounded-xl flex gap-2">
+                        <button id="btn-ikhwan" onclick="switchDirectorTab('ikhwan')" class="flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentDirectorTab === 'ikhwan' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}"><i data-lucide="user" class="w-4 h-4"></i> Ikhwan</button>
+                        <button id="btn-akhwat" onclick="switchDirectorTab('akhwat')" class="flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 ${currentDirectorTab === 'akhwat' ? 'bg-white text-pink-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}"><i data-lucide="user" class="w-4 h-4"></i> Akhwat</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 text-sm">
+                        <div class="relative flex-1 min-w-[150px]"><i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i><input type="text" id="searchInput" placeholder="Cari..." oninput="handleSearch(this.value)" value="${searchKeyword}" class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm placeholder:text-slate-400"></div>
+                        <div class="relative w-auto"><select onchange="handleSort(this.value)" class="pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm cursor-pointer appearance-none"><option value="name_asc" ${sortOrder === 'name_asc' ? 'selected' : ''}>A-Z</option><option value="name_desc" ${sortOrder === 'name_desc' ? 'selected' : ''}>Z-A</option><option value="date_new" ${sortOrder === 'date_new' ? 'selected' : ''}>Baru</option></select><i data-lucide="arrow-up-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div>
+                        <div class="relative w-auto"><select onchange="handleFilter('dept', this.value)" class="w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none truncate"><option value="">Dept: Semua</option>${deptOptions}</select><i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div>
+                    </div>
+                </div>
+                <div id="employee-list-container" class="fade-in min-h-[300px]"></div>
+                ` : `
+                <div id="org-chart-container" class="fade-in overflow-x-auto pb-10 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="tree w-full">
+                        <ul>
+                            <li>
+                                <div class="tree-node font-bold bg-blue-50 border-blue-200 text-blue-800">
+                                    <span class="tree-node-header text-sm">Direktur Utama</span>
+                                    <span class="tree-node-sub">Pimpinan</span>
+                                </div>
+                                <ul id="tree-root"></ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                `}
+            </div>`;
+        }
+
+        function toggleViewMode(mode) {
+            viewModeDirektur = mode;
+            renderPage('direktur');
         }
 
         function updateEmployeeGrid() {
+            if(viewModeDirektur === 'tree') {
+                renderOrgChart();
+                return;
+            }
             const container = document.getElementById('employee-list-container');
             if (!container) return;
             const isMatch = (dataGender, tabGender) => normalizeGender(dataGender) === tabGender;
@@ -536,15 +818,13 @@
             if (filterDiv) filtered = filtered.filter(d => getProp(d, ['divisi', 'division']) === filterDiv);
             if (searchKeyword) {
                 const lowerKey = searchKeyword.toLowerCase();
-                filtered = filtered.filter(d => (getProp(d, ['nama_lengkap', 'name']) || '').toLowerCase().includes(lowerKey) || (String(getProp(d, ['nip'])) || '').toLowerCase().includes(lowerKey) || (getProp(d, ['jabatan', 'position']) || '').toLowerCase().includes(lowerKey));
+                filtered = filtered.filter(d => (getProp(d, ['nama_lengkap', 'name']) || '').toLowerCase().includes(lowerKey) || (String(getProp(d, ['nip'])) || '').toLowerCase().includes(lowerKey));
             }
             filtered.sort((a, b) => {
                 const nameA = (getProp(a, ['nama_lengkap', 'name']) || '').toLowerCase();
                 const nameB = (getProp(b, ['nama_lengkap', 'name']) || '').toLowerCase();
-                const dateA = new Date(getProp(a, ['tanggal_bergabung', 'join_date']) || 0);
-                const dateB = new Date(getProp(b, ['tanggal_bergabung', 'join_date']) || 0);
                 if (sortOrder === 'name_desc') return nameB.localeCompare(nameA);
-                if (sortOrder === 'date_new') return dateB - dateA;
+                if (sortOrder === 'date_new') return new Date(getProp(b, ['tanggal_bergabung'])) - new Date(getProp(a, ['tanggal_bergabung']));
                 return nameA.localeCompare(nameB);
             });
             const divisions = [...new Set(filtered.map(d => getProp(d, ['divisi', 'division']) || 'Tanpa Divisi'))].sort();
@@ -568,96 +848,163 @@
             lucide.createIcons();
         }
 
-        // --- TOOLS & GENERATOR (Restored Full Features) ---
-        function getGeneratorHTML() {
-            return `<div class="max-w-2xl mx-auto space-y-8 fade-in"><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center"><i data-lucide="calculator" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Kalkulator Zakat & PPh21</h2><p class="text-xs text-slate-500">Estimasi kewajiban bulanan Anda.</p></div></div><div class="space-y-4"><div><label class="block text-sm font-medium text-slate-700 mb-2">Penghasilan Bruto (Sebulan):</label><input type="number" id="calc-gaji" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="Contoh: 5000000"></div><div><label class="block text-sm font-medium text-slate-700 mb-2">Status Pernikahan (Untuk PPh21):</label><select id="calc-status" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm text-slate-600"><option value="TK0">TK/0 (Tidak Kawin, Tanpa Tanggungan)</option><option value="TK1">TK/1 (Tidak Kawin, 1 Tanggungan)</option><option value="K0">K/0 (Kawin, Tanpa Tanggungan)</option><option value="K1">K/1 (Kawin, 1 Tanggungan)</option><option value="K2">K/2 (Kawin, 2 Tanggungan)</option><option value="K3">K/3 (Kawin, 3 Tanggungan)</option></select></div><button onclick="calculateFinance()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-medium">Hitung Estimasi</button><div id="calc-result" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3"><div class="flex justify-between items-center pb-2 border-b border-slate-200"><span class="text-sm text-slate-600">Zakat Profesi (2.5%)</span><span id="res-zakat" class="font-bold text-emerald-600">Rp 0</span></div><div class="flex justify-between items-center"><span class="text-sm text-slate-600">Estimasi PPh21 (TER A)</span><span id="res-tax" class="font-bold text-red-500">Rp 0</span></div><p class="text-[10px] text-slate-400 mt-2 text-center">*Perhitungan PPh21 menggunakan skema TER (Tarif Efektif Rata-rata) bulanan terbaru.</p></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="align-left" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Generator Teks</h2><p class="text-xs text-slate-500">Format teks (tebal, miring, paragraf) untuk Info & Ebook.</p></div></div><div class="space-y-4"><div><label class="block text-sm font-medium text-slate-700 mb-2">Editor:</label><div class="flex flex-wrap gap-1 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-lg"><button onclick="formatText('b')" class="p-2 hover:bg-white rounded transition" title="Tebal"><i data-lucide="bold" class="w-4 h-4"></i></button><button onclick="formatText('i')" class="p-2 hover:bg-white rounded transition" title="Miring"><i data-lucide="italic" class="w-4 h-4"></i></button><button onclick="formatText('u')" class="p-2 hover:bg-white rounded transition" title="Garis Bawah"><i data-lucide="underline" class="w-4 h-4"></i></button><div class="w-px h-6 bg-slate-300 mx-1 self-center"></div><button onclick="formatText('left')" class="p-2 hover:bg-white rounded transition" title="Rata Kiri"><i data-lucide="align-left" class="w-4 h-4"></i></button><button onclick="formatText('center')" class="p-2 hover:bg-white rounded transition" title="Rata Tengah"><i data-lucide="align-center" class="w-4 h-4"></i></button><button onclick="formatText('right')" class="p-2 hover:bg-white rounded transition" title="Rata Kanan"><i data-lucide="align-right" class="w-4 h-4"></i></button><button onclick="formatText('justify')" class="p-2 hover:bg-white rounded transition" title="Justify"><i data-lucide="align-justify" class="w-4 h-4"></i></button></div><textarea id="genInput" rows="5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ketik teks di sini..."></textarea></div><div class="flex gap-2"><button onclick="runGenerator()" class="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 text-sm font-medium">Generate HTML</button><button onclick="document.getElementById('genInput').value=''; document.getElementById('genOutput').value='';" class="px-4 py-2.5 bg-slate-100 rounded-xl hover:bg-slate-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><textarea id="genOutput" rows="3" readonly class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800" onclick="this.select()"></textarea><button onclick="copyGenResult()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-medium">Salin Hasil</button></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center"><i data-lucide="image" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Generator Link Gambar</h2><p class="text-xs text-slate-500">Ubah link Google Drive menjadi Direct Link.</p></div></div><div class="space-y-4"><input type="text" id="driveInput" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm" placeholder="Paste link Google Drive..."><button onclick="runDriveGenerator()" class="w-full bg-pink-600 text-white px-4 py-2.5 rounded-xl hover:bg-pink-700 text-sm font-medium">Convert Link</button><div id="driveResultContainer" class="hidden space-y-4"><div class="flex gap-2"><input type="text" id="driveOutput" readonly class="flex-1 p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800" onclick="this.select()"><button onclick="copyDriveResult()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700"><i data-lucide="copy" class="w-4 h-4"></i></button></div><div class="border border-slate-100 rounded-xl p-4 text-center"><p class="text-xs text-slate-400 mb-2">Preview:</p><img id="drivePreview" src="" class="max-h-48 mx-auto rounded-lg shadow-sm" alt="Preview"></div></div></div></div></div>`;
+        function renderOrgChart() {
+            const container = document.getElementById('tree-root');
+            if(!container) return;
+            
+            // Group by Dept -> Div -> Employees
+            const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department']) || 'Umum'))].sort();
+            
+            let html = '';
+            departments.forEach(dept => {
+                const employeesInDept = dataKaryawan.filter(d => (getProp(d, ['departemen', 'department']) || 'Umum') === dept);
+                const divisions = [...new Set(employeesInDept.map(d => getProp(d, ['divisi', 'division']) || 'General'))].sort();
+                
+                html += `
+                <li>
+                    <a href="#" class="tree-node font-semibold bg-indigo-50 border-indigo-100">
+                        <span class="tree-node-header">${dept}</span>
+                        <span class="tree-node-sub">${employeesInDept.length} Orang</span>
+                    </a>
+                    <ul>`;
+                    
+                divisions.forEach(div => {
+                    const emps = employeesInDept.filter(d => (getProp(d, ['divisi', 'division']) || 'General') === div);
+                    html += `
+                    <li>
+                        <a href="#" class="tree-node bg-white">
+                            <span class="tree-node-header text-blue-600">${div}</span>
+                            <span class="tree-node-sub">${emps.length} Staff</span>
+                        </a>
+                        <ul>`;
+                        
+                        emps.forEach(emp => {
+                             const name = getProp(emp, ['nama_lengkap', 'name']);
+                             html += `<li><a href="javascript:void(0)" onclick="openDetail('${getProp(emp, 'id')}')" class="tree-node hover:bg-slate-50"><div class="w-8 h-8 rounded-full overflow-hidden mx-auto mb-1 border border-slate-200"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-full h-full object-cover"></div><span class="tree-node-header text-[10px] whitespace-normal">${name}</span></a></li>`;
+                        });
+                        
+                    html += `</ul></li>`;
+                });
+                
+                html += `</ul></li>`;
+            });
+            container.innerHTML = html;
         }
 
-        function calculateFinance() {
-            const gaji = parseFloat(document.getElementById('calc-gaji').value) || 0;
-            if (gaji <= 0) { showToast("Masukkan nominal gaji.", "bg-red-600"); return; }
-            const zakat = gaji * 0.025;
-            let taxRate = 0;
-            if (gaji <= 5400000) taxRate = 0; else if (gaji <= 5650000) taxRate = 0.0025; else if (gaji <= 5950000) taxRate = 0.005; else if (gaji <= 6300000) taxRate = 0.0075; else if (gaji <= 6750000) taxRate = 0.01; else if (gaji <= 7500000) taxRate = 0.015; else if (gaji <= 8550000) taxRate = 0.02; else if (gaji <= 9650000) taxRate = 0.025; else if (gaji <= 11050000) taxRate = 0.03; else taxRate = 0.05; 
-            const tax = gaji * taxRate;
-            document.getElementById('res-zakat').textContent = "Rp " + zakat.toLocaleString('id-ID');
-            document.getElementById('res-tax').textContent = "Rp " + tax.toLocaleString('id-ID');
-            document.getElementById('calc-result').classList.remove('hidden');
+        // --- TOOLS & GENERATOR (Restored) ---
+        function getGeneratorHTML() { /* ... existing code ... */ return `<div class="max-w-2xl mx-auto space-y-8 fade-in"><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center"><i data-lucide="calculator" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Kalkulator Zakat & PPh21</h2><p class="text-xs text-slate-500">Estimasi kewajiban bulanan Anda.</p></div></div><div class="space-y-4"><div><label class="block text-sm font-medium text-slate-700 mb-2">Penghasilan Bruto (Sebulan):</label><input type="number" id="calc-gaji" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="Contoh: 5000000"></div><div><label class="block text-sm font-medium text-slate-700 mb-2">Status Pernikahan (Untuk PPh21):</label><select id="calc-status" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm text-slate-600"><option value="TK0">TK/0 (Tidak Kawin, Tanpa Tanggungan)</option><option value="TK1">TK/1 (Tidak Kawin, 1 Tanggungan)</option><option value="K0">K/0 (Kawin, Tanpa Tanggungan)</option><option value="K1">K/1 (Kawin, 1 Tanggungan)</option><option value="K2">K/2 (Kawin, 2 Tanggungan)</option><option value="K3">K/3 (Kawin, 3 Tanggungan)</option></select></div><button onclick="calculateFinance()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-medium">Hitung Estimasi</button><div id="calc-result" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3"><div class="flex justify-between items-center pb-2 border-b border-slate-200"><span class="text-sm text-slate-600">Zakat Profesi (2.5%)</span><span id="res-zakat" class="font-bold text-emerald-600">Rp 0</span></div><div class="flex justify-between items-center"><span class="text-sm text-slate-600">Estimasi PPh21 (TER A)</span><span id="res-tax" class="font-bold text-red-500">Rp 0</span></div><p class="text-[10px] text-slate-400 mt-2 text-center">*Perhitungan PPh21 menggunakan skema TER (Tarif Efektif Rata-rata) bulanan terbaru.</p></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="align-left" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Generator Teks</h2><p class="text-xs text-slate-500">Format teks (tebal, miring, paragraf) untuk Info & Ebook.</p></div></div><div class="space-y-4"><div><label class="block text-sm font-medium text-slate-700 mb-2">Editor:</label><div class="flex flex-wrap gap-1 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-lg"><button onclick="formatText('b')" class="p-2 hover:bg-white rounded transition" title="Tebal"><i data-lucide="bold" class="w-4 h-4"></i></button><button onclick="formatText('i')" class="p-2 hover:bg-white rounded transition" title="Miring"><i data-lucide="italic" class="w-4 h-4"></i></button><button onclick="formatText('u')" class="p-2 hover:bg-white rounded transition" title="Garis Bawah"><i data-lucide="underline" class="w-4 h-4"></i></button><div class="w-px h-6 bg-slate-300 mx-1 self-center"></div><button onclick="formatText('left')" class="p-2 hover:bg-white rounded transition" title="Rata Kiri"><i data-lucide="align-left" class="w-4 h-4"></i></button><button onclick="formatText('center')" class="p-2 hover:bg-white rounded transition" title="Rata Tengah"><i data-lucide="align-center" class="w-4 h-4"></i></button><button onclick="formatText('right')" class="p-2 hover:bg-white rounded transition" title="Rata Kanan"><i data-lucide="align-right" class="w-4 h-4"></i></button><button onclick="formatText('justify')" class="p-2 hover:bg-white rounded transition" title="Justify"><i data-lucide="align-justify" class="w-4 h-4"></i></button></div><textarea id="genInput" rows="5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ketik teks di sini..."></textarea></div><div class="flex gap-2"><button onclick="runGenerator()" class="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 text-sm font-medium">Generate HTML</button><button onclick="document.getElementById('genInput').value=''; document.getElementById('genOutput').value='';" class="px-4 py-2.5 bg-slate-100 rounded-xl hover:bg-slate-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><textarea id="genOutput" rows="3" readonly class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800" onclick="this.select()"></textarea><button onclick="copyGenResult()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-medium">Salin Hasil</button></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center"><i data-lucide="image" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Generator Link Gambar</h2><p class="text-xs text-slate-500">Ubah link Google Drive menjadi Direct Link.</p></div></div><div class="space-y-4"><input type="text" id="driveInput" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm" placeholder="Paste link Google Drive..."><button onclick="runDriveGenerator()" class="w-full bg-pink-600 text-white px-4 py-2.5 rounded-xl hover:bg-pink-700 text-sm font-medium">Convert Link</button><div id="driveResultContainer" class="hidden space-y-4"><div class="flex gap-2"><input type="text" id="driveOutput" readonly class="flex-1 p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800" onclick="this.select()"><button onclick="copyDriveResult()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700"><i data-lucide="copy" class="w-4 h-4"></i></button></div><div class="border border-slate-100 rounded-xl p-4 text-center"><p class="text-xs text-slate-400 mb-2">Preview:</p><img id="drivePreview" src="" class="max-h-48 mx-auto rounded-lg shadow-sm" alt="Preview"></div></div></div></div></div>`; }
+        function calculateFinance() { const gaji = parseFloat(document.getElementById('calc-gaji').value) || 0; if (gaji <= 0) { showToast("Masukkan nominal gaji.", "bg-red-600"); return; } const zakat = gaji * 0.025; let taxRate = 0; if (gaji <= 5400000) taxRate = 0; else if (gaji <= 5650000) taxRate = 0.0025; else if (gaji <= 5950000) taxRate = 0.005; else if (gaji <= 6300000) taxRate = 0.0075; else if (gaji <= 6750000) taxRate = 0.01; else if (gaji <= 7500000) taxRate = 0.015; else if (gaji <= 8550000) taxRate = 0.02; else if (gaji <= 9650000) taxRate = 0.025; else if (gaji <= 11050000) taxRate = 0.03; else taxRate = 0.05; const tax = gaji * taxRate; document.getElementById('res-zakat').textContent = "Rp " + zakat.toLocaleString('id-ID'); document.getElementById('res-tax').textContent = "Rp " + tax.toLocaleString('id-ID'); document.getElementById('calc-result').classList.remove('hidden'); }
+        function runGenerator() { const input = document.getElementById('genInput').value; if(!input) return; document.getElementById('genOutput').value = input.replace(/\n/g, '<br>'); }
+        function copyGenResult() { const t = document.getElementById("genOutput"); if(!t.value) return; t.select(); t.setSelectionRange(0, 99999); navigator.clipboard.writeText(t.value).then(() => showToast("Disalin!", "bg-emerald-600")); }
+        function formatText(cmd) { const input = document.getElementById('genInput'); const start = input.selectionStart, end = input.selectionEnd, text = input.value, sel = text.substring(start, end); if (!sel) return; let fmt = ''; switch(cmd) { case 'b': fmt=`<b>${sel}</b>`; break; case 'i': fmt=`<i>${sel}</i>`; break; case 'u': fmt=`<u>${sel}</u>`; break; case 'left': fmt=`<div class="text-left">${sel}</div>`; break; case 'center': fmt=`<div class="text-center">${sel}</div>`; break; case 'right': fmt=`<div class="text-right">${sel}</div>`; break; case 'justify': fmt=`<div class="text-justify">${sel}</div>`; break; } input.value = text.substring(0, start) + fmt + text.substring(end); }
+        function runDriveGenerator() { const input = document.getElementById('driveInput').value; if(!input) return; const m = input.match(/[-\w]{25,}/); if (m) { const l = `https://lh3.googleusercontent.com/d/${m[0]}`; document.getElementById('driveResultContainer').classList.remove('hidden'); document.getElementById('driveOutput').value = l; document.getElementById('drivePreview').src = l; showToast("Berhasil!", "bg-emerald-600"); } else { showToast("Format salah", "bg-red-600"); } }
+        function copyDriveResult() { const t = document.getElementById("driveOutput"); t.select(); t.setSelectionRange(0, 99999); navigator.clipboard.writeText(t.value).then(() => showToast("Disalin!", "bg-emerald-600")); }
+        
+        // --- LEAVE FORM LOGIC (NEW) ---
+        function openLeaveForm() {
+            const modal = document.getElementById('global-modal');
+            const modalContent = document.getElementById('modal-content');
+            
+            // Build options for select name
+            const nameOptions = dataKaryawan.map(k => `<option value="${getProp(k, ['nama_lengkap', 'name'])} - ${getProp(k, ['divisi', 'division'])}">${getProp(k, ['nama_lengkap', 'name'])}</option>`).join('');
+            
+            modalContent.innerHTML = `
+                <div class="relative">
+                    <button onclick="closeModal()" class="absolute -top-2 -right-2 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 z-50 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    <h3 class="text-xl font-bold text-slate-800 mb-1">Form Pengajuan Cuti</h3>
+                    <p class="text-xs text-slate-500 mb-6">Isi data berikut untuk membuat pesan WhatsApp otomatis ke HRD.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nama Karyawan</label>
+                            <select id="leave-name" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="">-- Pilih Nama --</option>
+                                ${nameOptions}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Jenis Pengajuan</label>
+                            <select id="leave-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                <option value="Cuti Tahunan">Cuti Tahunan</option>
+                                <option value="Izin Sakit">Izin Sakit</option>
+                                <option value="Izin Pribadi">Izin Pribadi / Urusan Keluarga</option>
+                                <option value="Cuti Melahirkan">Cuti Melahirkan</option>
+                                <option value="Unpaid Leave">Cuti Di Luar Tanggungan (Unpaid)</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Dari Tanggal</label>
+                                <input type="date" id="leave-start" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Sampai Tanggal</label>
+                                <input type="date" id="leave-end" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Alasan / Keterangan</label>
+                            <textarea id="leave-reason" rows="3" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan keperluan Anda..."></textarea>
+                        </div>
+                        <button onclick="submitLeaveForm()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-200 flex items-center justify-center gap-2 transition transform active:scale-95">
+                            <i data-lucide="send" class="w-4 h-4"></i> Kirim Pengajuan via WA
+                        </button>
+                    </div>
+                </div>`;
+            
+            modal.classList.remove('hidden');
+            lucide.createIcons();
         }
 
-        // --- GENERATOR FUNCTIONS (Restored) ---
-        function runGenerator() {
-            const input = document.getElementById('genInput').value;
-            if(!input) return;
-            const output = input.replace(/\n/g, '<br>');
-            document.getElementById('genOutput').value = output;
-        }
-        function copyGenResult() {
-            const copyText = document.getElementById("genOutput");
-            if(!copyText.value) return;
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); 
-            navigator.clipboard.writeText(copyText.value).then(() => { showToast("Teks berhasil disalin!", "bg-emerald-600"); });
-        }
-        function formatText(cmd) {
-            const input = document.getElementById('genInput');
-            const start = input.selectionStart;
-            const end = input.selectionEnd;
-            const text = input.value;
-            const selected = text.substring(start, end);
-            if (!selected) return;
-            let formatted = '';
-            switch(cmd) {
-                case 'b': formatted = `<b>${selected}</b>`; break;
-                case 'i': formatted = `<i>${selected}</i>`; break;
-                case 'u': formatted = `<u>${selected}</u>`; break;
-                case 'left': formatted = `<div class="text-left">${selected}</div>`; break;
-                case 'center': formatted = `<div class="text-center">${selected}</div>`; break;
-                case 'right': formatted = `<div class="text-right">${selected}</div>`; break;
-                case 'justify': formatted = `<div class="text-justify">${selected}</div>`; break;
+        function submitLeaveForm() {
+            const name = document.getElementById('leave-name').value;
+            const type = document.getElementById('leave-type').value;
+            const start = document.getElementById('leave-start').value;
+            const end = document.getElementById('leave-end').value;
+            const reason = document.getElementById('leave-reason').value;
+
+            if (!name || !start || !end || !reason) {
+                showToast("Harap lengkapi semua data!", "bg-red-600");
+                return;
             }
-            input.value = text.substring(0, start) + formatted + text.substring(end);
-        }
-        function runDriveGenerator() {
-            const input = document.getElementById('driveInput').value;
-            if(!input) return;
-            const idRegex = /[-\w]{25,}/;
-            const match = input.match(idRegex);
-            if (match) {
-                const directLink = `https://lh3.googleusercontent.com/d/${match[0]}`;
-                const container = document.getElementById('driveResultContainer');
-                const output = document.getElementById('driveOutput');
-                const preview = document.getElementById('drivePreview');
-                container.classList.remove('hidden');
-                output.value = directLink;
-                preview.src = directLink;
-                showToast("Link berhasil dikonversi!", "bg-emerald-600");
-            } else {
-                showToast("Format link tidak dikenali", "bg-red-600");
-            }
-        }
-        function copyDriveResult() {
-            const copyText = document.getElementById("driveOutput");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(copyText.value).then(() => { showToast("Link disalin!", "bg-emerald-600"); });
+
+            // Calculate duration days roughly
+            const d1 = new Date(start);
+            const d2 = new Date(end);
+            const diffTime = Math.abs(d2 - d1);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+
+            // Format WhatsApp Message
+            const text = `*FORMULIR PENGAJUAN CUTI / IZIN*%0A%0A` +
+                         `Kepada Yth. HRD,%0ASaya yang bertanda tangan di bawah ini:%0A%0A` +
+                         `*Nama:* ${name}%0A` +
+                         `*Jenis:* ${type}%0A` +
+                         `*Tanggal:* ${formatDateIndo(start)} s/d ${formatDateIndo(end)} (${diffDays} Hari)%0A` +
+                         `*Keperluan:* ${reason}%0A%0A` +
+                         `Mohon persetujuannya. Terima kasih.`;
+
+            // Open WhatsApp (Replace generic number with placeholder logic if needed, currently using dummy)
+            const waNumber = "6281234567890"; 
+            window.open(`https://wa.me/${waNumber}?text=${text}`, '_blank');
+            closeModal();
         }
 
         // --- TAB & FILTER LOGIC (Restored Simple Logic) ---
         function switchDirectorTab(tab) {
             currentDirectorTab = tab;
+            updateEmployeeGrid(); 
+            // Update buttons visually
             const btnIkhwan = document.getElementById('btn-ikhwan');
             const btnAkhwat = document.getElementById('btn-akhwat');
-            if (btnIkhwan && btnAkhwat) {
-                if (tab === 'ikhwan') {
+            if(btnIkhwan && btnAkhwat) {
+                if(tab === 'ikhwan') {
                     btnIkhwan.className = "flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 bg-white text-blue-600 shadow-sm";
-                    btnAkhwat.className = "flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
+                    btnAkhwat.className = "flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700";
                 } else {
-                    btnIkhwan.className = "flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
+                    btnIkhwan.className = "flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 text-slate-500 hover:text-slate-700";
                     btnAkhwat.className = "flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-2 bg-white text-pink-600 shadow-sm";
                 }
             }
-            updateEmployeeGrid(); 
         }
 
         function handleSearch(val) { searchKeyword = val; updateEmployeeGrid(); }
@@ -686,6 +1033,7 @@
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
             
+            // ... (Variable extraction remains same as previous code)
             const name = getProp(emp, ['nama_lengkap', 'name']);
             const gelar = getProp(emp, ['gelar', 'title']) || '';
             const jab = getProp(emp, ['jabatan', 'position']);
@@ -735,6 +1083,7 @@
             if (!item) return;
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
+            // ... (Variable extraction same as before)
             const type = getProp(item, ['type', 'jenis', 'kategori']);
             const title = getProp(item, ['title', 'judul']);
             const date = getProp(item, ['date', 'tanggal']);
@@ -756,6 +1105,7 @@
             if (!book) return;
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
+            // ... (Variable extraction same as before)
             const title = getProp(book, ['title', 'judul', 'judul_buku']);
             const author = getProp(book, ['author', 'penulis', 'pengarang']);
             const pages = getProp(book, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman']);
@@ -789,11 +1139,36 @@
         function closeModal() { document.getElementById('global-modal').classList.add('hidden'); }
         // --- HRD SERVICE ---
         function getKontakHRDHTML() {
-             return `<div class="space-y-6 fade-in"><div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="user-cog" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Kepegawaian</h3><p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p><a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100"><i data-lucide="wallet" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Payroll</h3><p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p><a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div></div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Informasi Kantor</h3></div><div class="p-5 space-y-4"><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Jam Operasional</p><p class="text-xs text-slate-500 mt-0.5">Senin - Jumat, 08.00 - 16.00 WIB</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0"><i data-lucide="map-pin" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Lokasi Kantor</p><p class="text-xs text-slate-500 mt-0.5">Gedung Utama Lt. 2, Ruang 204</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0"><i data-lucide="mail" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Email Resmi</p><p class="text-xs text-slate-500 mt-0.5">hrd@organisasi.id</p></div></div></div></div></div>`;
+             return `<div class="space-y-6 fade-in">
+                <div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div>
+                    <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="user-cog" class="w-6 h-6"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-slate-800">Admin Kepegawaian</h3>
+                            <p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p>
+                            <!-- Updated Button for Leave Form -->
+                            <button onclick="openLeaveForm()" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto shadow-md shadow-blue-200"><i data-lucide="file-plus" class="w-4 h-4"></i> Buat Pengajuan Cuti</button>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100"><i data-lucide="wallet" class="w-6 h-6"></i></div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-slate-800">Admin Payroll</h3>
+                            <p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p>
+                            <a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto shadow-md shadow-emerald-200"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
         }
         
         // --- INIT ---
         document.addEventListener("DOMContentLoaded", () => {
+            initTheme(); // Load saved theme first
             fetchAllData();
             renderPage('beranda');
         });
