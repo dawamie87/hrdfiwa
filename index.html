@@ -287,10 +287,31 @@
             return null;
         }
 
+        // DATE PARSER for dd/mm/yyyy
+        function parseDate(dateInput) {
+            if (!dateInput) return null;
+            if (dateInput instanceof Date) return dateInput;
+            
+            // Check for dd/mm/yyyy format
+            // Allow / or - as separator
+            const dmy = String(dateInput).match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (dmy) {
+                // new Date(year, monthIndex, day)
+                // dmy[3] = year, dmy[2] = month, dmy[1] = day
+                // Note: monthIndex is 0-11
+                return new Date(dmy[3], parseInt(dmy[2]) - 1, dmy[1]);
+            }
+            
+            // Try standard Date parsing for other formats (ISO, etc.)
+            const d = new Date(dateInput);
+            if (!isNaN(d.getTime())) return d;
+            
+            return null;
+        }
+
         function formatDateIndo(dateString) {
-            if (!dateString) return "-";
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return dateString; 
+            const date = parseDate(dateString);
+            if (!date || isNaN(date.getTime())) return "-";
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
@@ -298,9 +319,8 @@
         }
         
         function hitungMasaKerja(dateString) {
-            if (!dateString) return "";
-            let startDate = new Date(dateString);
-            if (isNaN(startDate.getTime())) return "";
+            const startDate = parseDate(dateString);
+            if (!startDate || isNaN(startDate.getTime())) return "";
             const now = new Date();
             let years = now.getFullYear() - startDate.getFullYear();
             let months = now.getMonth() - startDate.getMonth();
@@ -370,7 +390,7 @@
             }
         }
 
-        // --- PRAYER TIMES LOGIC ---
+        // --- PRAYER TIMES LOGIC (UPDATED) ---
         async function fetchPrayerTimes() {
             const date = new Date();
             const dateStr = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
@@ -559,24 +579,33 @@
             
             const now = new Date();
             const currentMonth = now.getMonth();
-            const newJoiners = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_bergabung', 'join_date']); if(!dateVal) return false; const joinDate = new Date(dateVal); return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear(); });
-            const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = new Date(dateVal); return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
+            const newJoiners = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_bergabung', 'join_date']); if(!dateVal) return false; const joinDate = parseDate(dateVal); return joinDate && joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear(); });
+            const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-            const expiringNextMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = new Date(dateVal); return expDate.getMonth() === nextMonth.getMonth() && expDate.getFullYear() === nextMonth.getFullYear(); });
+            const expiringNextMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === nextMonth.getMonth() && expDate.getFullYear() === nextMonth.getFullYear(); });
             
             const birthdaysThisMonth = dataKaryawan.filter(d => {
                 const dobVal = getProp(d, ['tanggal_lahir', 'dob', 'birth_date']);
                 if(!dobVal) return false;
-                const dob = new Date(dobVal);
-                return dob.getMonth() === currentMonth;
+                const dob = parseDate(dobVal);
+                return dob && dob.getMonth() === currentMonth;
             }).sort((a,b) => {
-                const dateA = new Date(getProp(a, ['tanggal_lahir'])).getDate();
-                const dateB = new Date(getProp(b, ['tanggal_lahir'])).getDate();
+                const dateA = parseDate(getProp(a, ['tanggal_lahir'])).getDate();
+                const dateB = parseDate(getProp(b, ['tanggal_lahir'])).getDate();
                 return dateA - dateB;
             });
 
             const recentInfo = dataInfo.slice(0, 3);
             const calendarHTML = generateCalendarHTML();
+            
+            // Sort agendas by date (closest first)
+            const sortedAgendas = [...dataAgenda].sort((a, b) => {
+                const dateA = parseDate(getProp(a, ['date', 'tanggal']));
+                const dateB = parseDate(getProp(b, ['date', 'tanggal']));
+                if (!dateA) return 1;
+                if (!dateB) return -1;
+                return dateA - dateB;
+            });
 
             return `<div class="space-y-6">
                 <!-- Welcome Banner -->
@@ -683,7 +712,7 @@
                             <span class="bg-pink-100 text-pink-700 text-xs px-2 py-0.5 rounded-full font-bold">${birthdaysThisMonth.length}</span>
                         </div>
                         <div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">
-                            ${birthdaysThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada yang berulang tahun bulan ini.</p>' : birthdaysThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const dob = new Date(getProp(emp, ['tanggal_lahir', 'dob'])); const dateStr = `${dob.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][dob.getMonth()]}`; const isToday = dob.getDate() === now.getDate(); return `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100 ${isToday ? 'bg-pink-50 border-pink-100' : ''}"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><div class="text-right"><span class="text-xs font-bold text-pink-600 block">${dateStr}</span>${isToday ? '<span class="text-[8px] bg-pink-600 text-white px-1.5 py-0.5 rounded-full">HARI INI!</span>' : ''}</div></div>` }).join('')}
+                            ${birthdaysThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada yang berulang tahun bulan ini.</p>' : birthdaysThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const dob = parseDate(getProp(emp, ['tanggal_lahir', 'dob'])); const dateStr = `${dob.getDate()} ${["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"][dob.getMonth()]}`; const isToday = dob.getDate() === now.getDate(); return `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100 ${isToday ? 'bg-pink-50 border-pink-100' : ''}"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><div class="text-right"><span class="text-xs font-bold text-pink-600 block">${dateStr}</span>${isToday ? '<span class="text-[8px] bg-pink-600 text-white px-1.5 py-0.5 rounded-full">HARI INI!</span>' : ''}</div></div>` }).join('')}
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
@@ -707,10 +736,11 @@
 
                         <!-- Agenda List (Scrollable) -->
                         <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t border-slate-100 pt-3">
-                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Agenda Bulan Ini</h4>
-                            ${dataAgenda.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda.</p>' : 
-                            dataAgenda.map(agenda => {
-                                const agDate = new Date(getProp(agenda, ['date', 'tanggal']));
+                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">Agenda Mendatang</h4>
+                            ${sortedAgendas.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda.</p>' : 
+                            sortedAgendas.map(agenda => {
+                                const agDate = parseDate(getProp(agenda, ['date', 'tanggal']));
+                                if (!agDate) return '';
                                 const isPast = agDate < new Date().setHours(0,0,0,0);
                                 return `
                                 <div class="flex gap-3 mb-3 last:mb-0 group">
@@ -740,10 +770,10 @@
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = now.getDate();
             
-            // Map agendas to dates
+            // Map agendas to dates using the parser
             const agendaDates = dataAgenda.map(item => { 
-                const d = new Date(getProp(item, ['date', 'tanggal'])); 
-                if (!isNaN(d.getTime()) && d.getMonth() === month && d.getFullYear() === year) return d.getDate(); 
+                const d = parseDate(getProp(item, ['date', 'tanggal'])); 
+                if (d && !isNaN(d.getTime()) && d.getMonth() === month && d.getFullYear() === year) return d.getDate(); 
                 return null; 
             }).filter(Boolean);
             
@@ -765,7 +795,6 @@
                 
                 if (day === today) classes += " calendar-today"; 
                 if (agendaDates.includes(day)) {
-                    // classes += " font-bold text-blue-600"; 
                     dot = `<div class="calendar-event-dot bg-indigo-500"></div>`;
                     if (day === today) dot = `<div class="calendar-event-dot bg-white"></div>`;
                 }
