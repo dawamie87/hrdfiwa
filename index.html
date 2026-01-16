@@ -4,92 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#2563eb">
-    <title>HRD Information</title>
+    <title>Sistem Informasi HRD</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3678/3678166.png">
     
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        /* Base Styles */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; -webkit-font-smoothing: antialiased; }
+        
+        /* Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* Sidebar Styling */
         .sidebar-link {
-            display: flex; align-items: center; gap: 0.75rem; 
-            padding: 0.75rem 1rem; border-radius: 0.75rem; font-size: 0.9rem; font-weight: 500;
+            display: flex; align-items: center; gap: 0.875rem; 
+            padding: 0.875rem 1rem; border-radius: 0.75rem; font-size: 0.9rem; font-weight: 500;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent; margin-bottom: 0.25rem;
+            border: 1px solid transparent; margin-bottom: 0.35rem;
         }
         .sidebar-active { background-color: #eff6ff; color: #2563eb; border-color: #dbeafe; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
         .sidebar-inactive { color: #64748b; }
         .sidebar-inactive:hover { background-color: #f8fafc; color: #1e293b; border-color: #e2e8f0; }
 
-        .active-tab-nav { color: #2563eb; }
-        .active-tab-nav i { fill: #eff6ff; }
+        /* Mobile Nav */
+        .active-tab-nav { color: #2563eb; position: relative; }
+        .active-tab-nav::after { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40%; height: 3px; background-color: #2563eb; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
         .inactive-tab-nav { color: #94a3b8; }
         
+        /* Animations */
         .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .modal-overlay { background-color: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
+        .loader { width: 48px; height: 48px; border: 5px solid #e2e8f0; border-bottom-color: #2563eb; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Modal & ID Card */
+        .modal-overlay { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur-sm; }
         .id-card-bg { background-image: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); position: relative; overflow: hidden; }
         .id-card-pattern { position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%; }
 
-        /* Calendar Styles */
+        /* Calendar */
         .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 0.75rem; position: relative; }
         .calendar-event::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background-color: #2563eb; border-radius: 50%; }
-        .calendar-today { background-color: #2563eb; color: white; font-weight: bold; }
+        .calendar-today { background-color: #2563eb; color: white; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3); }
         .calendar-today::after { background-color: white; }
     </style>
 </head>
-<body class="text-slate-800 flex flex-col md:flex-row min-h-screen">
+<body class="text-slate-800 flex flex-col md:flex-row min-h-screen selection:bg-blue-100 selection:text-blue-700">
 
-    <!-- SIDEBAR -->
-    <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-sm overflow-hidden">
-        <div class="p-6 border-b border-slate-100 mb-2 bg-white z-10">
-            <h1 class="text-xl font-bold text-blue-900 flex items-center gap-3">
-                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                    <i data-lucide="layout-grid" class="w-5 h-5"></i>
+    <!-- SIDEBAR (Desktop) -->
+    <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <!-- LOGO HEADER -->
+        <div class="px-6 py-6 border-b border-slate-100 mb-2 bg-white z-10">
+            <div class="flex items-center gap-3.5 select-none">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200 ring-2 ring-blue-50 ring-offset-1 transform hover:scale-105 transition-transform duration-300">
+                    <i data-lucide="layout-grid" class="w-6 h-6 stroke-[1.5]"></i>
                 </div>
-                HRD Info
-            </h1>
-            <p class="text-xs text-slate-400 mt-2 pl-12 font-medium tracking-wide">SISTEM TERPADU v2.0</p>
+                <div class="flex flex-col justify-center h-10">
+                    <h1 class="text-lg font-bold text-slate-800 leading-tight tracking-tight">HRD Portal</h1>
+                    <p class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-md w-fit mt-0.5 tracking-wide uppercase">Sistem Terpadu</p>
+                </div>
+            </div>
         </div>
-        <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
-            <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full"><i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span></button>
-            <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full"><i data-lucide="bell-ring" class="w-5 h-5"></i><span class="flex-1 text-left">Pusat Informasi</span></button>
-            <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full"><i data-lucide="users" class="w-5 h-5"></i><span class="flex-1 text-left">Data Karyawan</span></button>
-            <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full"><i data-lucide="book-open" class="w-5 h-5"></i><span class="flex-1 text-left">Ebook Panduan</span></button>
-            <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full"><i data-lucide="headset" class="w-5 h-5"></i><span class="flex-1 text-left">Layanan HRD</span></button>
-            <button onclick="renderPage('generator')" id="sidebar-generator" class="sidebar-link sidebar-inactive w-full"><i data-lucide="wand-2" class="w-5 h-5"></i><span class="flex-1 text-left">Tools & Kalkulator</span></button>
+
+        <!-- NAVIGATION -->
+        <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
+            <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full">
+                <i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span>
+            </button>
+            <button onclick="renderPage('informasi')" id="sidebar-informasi" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="bell-ring" class="w-5 h-5"></i><span class="flex-1 text-left">Pusat Informasi</span>
+            </button>
+            <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="users" class="w-5 h-5"></i><span class="flex-1 text-left">Data Karyawan</span>
+            </button>
+            <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="book-open" class="w-5 h-5"></i><span class="flex-1 text-left">Ebook Panduan</span>
+            </button>
+            <button onclick="renderPage('hrd')" id="sidebar-hrd" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="headset" class="w-5 h-5"></i><span class="flex-1 text-left">Layanan HRD</span>
+            </button>
+            <button onclick="renderPage('generator')" id="sidebar-generator" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="wand-2" class="w-5 h-5"></i><span class="flex-1 text-left">Tools & Kalkulator</span>
+            </button>
         </nav>
+
+        <!-- PROFILE WIDGET -->
         <div class="p-4 border-t border-slate-100 bg-white z-10">
-            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm"><i data-lucide="user" class="w-5 h-5"></i></div>
-                <div class="min-w-0"><p class="text-sm font-semibold text-slate-700 truncate">Karyawan</p><p class="text-xs text-slate-500 truncate">FIWA Member</p></div>
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors cursor-pointer group">
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 border border-slate-200 shadow-sm group-hover:scale-105 transition">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-slate-700 truncate">Karyawan</p>
+                    <p class="text-xs text-slate-500 truncate">User Access</p>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 ml-auto"></i>
             </div>
         </div>
     </aside>
 
-    <!-- CONTENT -->
+    <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative">
-        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:border-none md:bg-transparent md:static">
-            <div class="max-w-7xl mx-auto px-4 py-3 md:py-6 flex justify-between items-center">
-                <div class="md:hidden"><h1 class="text-lg font-bold text-blue-900 flex items-center gap-2"><i data-lucide="layout-grid" class="w-5 h-5 text-blue-600"></i> HRD Info</h1></div>
-                <div class="hidden md:block"><h2 class="text-xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan Karyawan FIWA</h2></div>
+        <!-- HEADER (Mobile Only) -->
+        <header class="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:hidden">
+            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    </div>
+                    <h1 class="text-lg font-bold text-slate-800 tracking-tight">HRD Portal</h1>
+                </div>
                 <div class="flex items-center gap-3">
-                    <button id="installPWA" class="hidden text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-medium shadow-md shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2"><i data-lucide="download" class="w-3 h-3"></i> Install App</button>
-                    <button class="p-2 rounded-full hover:bg-white hover:shadow-sm transition text-slate-600 relative"><i data-lucide="bell" class="w-5 h-5"></i><span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border border-white rounded-full"></span></button>
+                     <button class="p-2 rounded-full hover:bg-slate-100 transition text-slate-600 relative">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- DESKTOP HEADER (Hidden Mobile) -->
+        <header class="hidden md:block pt-8 pb-4 px-8">
+            <div class="flex justify-between items-end">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Ahlan Wasahlan, Karyawan</h2>
+                    <p class="text-slate-500 text-sm mt-1">Selamat datang di portal informasi kepegawaian terpadu.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="installPWA" class="hidden text-xs bg-blue-600 text-white px-4 py-2 rounded-full font-medium shadow-md shadow-blue-200 hover:bg-blue-700 hover:shadow-lg transition flex items-center gap-2 transform active:scale-95">
+                        <i data-lucide="download" class="w-3 h-3"></i> Install App
+                    </button>
+                    <div class="h-8 w-px bg-slate-200 mx-2"></div>
+                    <p class="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm" id="date-display">
+                        <!-- JS Date will go here -->
+                        Memuat tanggal...
+                    </p>
                 </div>
             </div>
         </header>
 
         <main id="app-content" class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8"></main>
 
+        <!-- MODAL SYSTEM -->
         <div id="global-modal" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
@@ -98,35 +162,60 @@
                 </div>
             </div>
         </div>
-        <div id="toast-container"></div>
+
+        <!-- TOAST SYSTEM -->
+        <div id="toast-container" class="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[70] flex flex-col items-end gap-2 pointer-events-none"></div>
     </div>
 
-    <!-- MOBILE NAV -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <div class="grid grid-cols-6 h-[4.5rem]">
-            <button onclick="renderPage('beranda')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 active-tab-nav" id="nav-beranda"><i data-lucide="home" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Home</span></button>
-            <button onclick="renderPage('informasi')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-informasi"><i data-lucide="info" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Info</span></button>
-            <button onclick="renderPage('direktur')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-direktur"><i data-lucide="users" class="w-5 h-5 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Karyawan</span></button>
-            <button onclick="renderPage('ebook')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-ebook"><i data-lucide="book-open" class="w-5 h-5 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Ebook</span></button>
-            <button onclick="renderPage('hrd')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-hrd"><i data-lucide="headset" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">HRD</span></button>
-            <button onclick="renderPage('generator')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-generator"><i data-lucide="wand-2" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[9px] font-medium tracking-wide">Tools</span></button>
+    <!-- MOBILE NAVIGATION (Bottom Bar) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
+        <div class="grid grid-cols-5 h-[4rem]"> 
+            <button onclick="renderPage('beranda')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 active-tab-nav" id="nav-beranda">
+                <i data-lucide="home" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Home</span>
+            </button>
+            <button onclick="renderPage('informasi')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-informasi">
+                <i data-lucide="bell" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Info</span>
+            </button>
+            <button onclick="renderPage('direktur')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-direktur">
+                <i data-lucide="users" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Data</span>
+            </button>
+            <button onclick="renderPage('hrd')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-hrd">
+                <i data-lucide="headset" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Layanan</span>
+            </button>
+            <!-- More menu for others -->
+            <button onclick="openMoreMenu()" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav relative">
+                <i data-lucide="menu" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Menu</span>
+                <!-- Mini Popover Menu -->
+                <div id="mobile-more-menu" class="hidden absolute bottom-[4.5rem] right-2 bg-white rounded-xl shadow-xl border border-slate-100 w-48 py-2 overflow-hidden origin-bottom-right">
+                    <div onclick="renderPage('ebook'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
+                        <i data-lucide="book-open" class="w-4 h-4"></i> <span class="text-sm font-medium">Ebook</span>
+                    </div>
+                    <div onclick="renderPage('generator'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700 border-t border-slate-100">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i> <span class="text-sm font-medium">Tools</span>
+                    </div>
+                </div>
+            </button>
         </div>
-        <div class="h-1 w-full bg-white"></div> 
+        <div class="h-safe w-full bg-white"></div> 
     </nav>
 
     <script>
+        // CONFIGURATION
         const API_URL = "https://script.google.com/macros/s/AKfycbyewRCKBX375YrWDPvoRkIOcHD8UENTO57Dbjl7a5mCzSQvXNhcydvY-1tCJCewrHlymg/exec";
         
+        // STATE MANAGEMENT
         let dataKaryawan = [], dataInfo = [], dataEbooks = [];
         let loadingState = { karyawan: false, info: false, ebook: false };
-        const ebookColors = ["bg-emerald-100 text-emerald-600", "bg-blue-100 text-blue-600", "bg-purple-100 text-purple-600", "bg-orange-100 text-orange-600", "bg-pink-100 text-pink-600", "bg-indigo-100 text-indigo-600"];
+        let isOfflineMode = false;
 
+        const ebookColors = ["bg-emerald-100 text-emerald-600", "bg-blue-100 text-blue-600", "bg-purple-100 text-purple-600", "bg-orange-100 text-orange-600", "bg-pink-100 text-pink-600", "bg-indigo-100 text-indigo-600"];
+        
         let currentPage = 'beranda';
         let currentDirectorTab = 'ikhwan';
         let searchKeyword = '', sortOrder = 'name_asc', filterDept = '', filterDiv = '';
         let genderChartInstance = null, divisionChartInstance = null, eduChartInstance = null;
 
-        // --- HELPER SMART MAPPING ---
+        // --- HELPER FUNCTIONS ---
         function getProp(obj, keys) {
             if (!obj) return null;
             if (!Array.isArray(keys)) keys = [keys];
@@ -142,7 +231,6 @@
             return null;
         }
 
-        // --- UTILS ---
         function formatDateIndo(dateString) {
             if (!dateString) return "-";
             const date = new Date(dateString);
@@ -152,6 +240,7 @@
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         }
+        
         function hitungMasaKerja(dateString) {
             if (!dateString) return "";
             let startDate = new Date(dateString);
@@ -167,6 +256,7 @@
             if (months > 0) result.push(`${months} Bln`);
             return result.length === 0 ? "Baru Bergabung" : result.join(" ");
         }
+
         function normalizeGender(g) {
             if (!g) return 'unknown';
             g = String(g).toLowerCase().trim();
@@ -174,6 +264,7 @@
             if (['akhwat', 'perempuan', 'wanita', 'p', 'female', 'putri'].includes(g)) return 'akhwat';
             return 'unknown';
         }
+
         function getDirectDriveUrl(url) {
             if (!url) return 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback';
             if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
@@ -184,28 +275,74 @@
             return url;
         }
 
-        // --- FETCH DATA ---
-        async function fetchAllData() {
-            if (!API_URL) return;
-            fetchDataGeneric('karyawan', (data) => { dataKaryawan = data; if (currentPage === 'beranda' || currentPage === 'direktur') renderPage(currentPage); });
-            fetchDataGeneric('info', (data) => { dataInfo = data; if (currentPage === 'informasi' || currentPage === 'beranda') renderPage(currentPage); });
-            fetchDataGeneric('ebook', (data) => { dataEbooks = data.map((item, index) => ({ ...item, color: ebookColors[index % ebookColors.length] })); if (currentPage === 'ebook' || currentPage === 'beranda') renderPage(currentPage); });
+        // --- MOCK DATA GENERATOR (FALLBACK) ---
+        function getMockData(type) {
+            if (type === 'karyawan') {
+                return [
+                    { id: 1, nama_lengkap: "Ahmad Fulan", nip: "EMP001", divisi: "IT", departemen: "Teknologi", jabatan: "Senior Developer", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2020-01-15", tanggal_akhir_kontrak: "2025-01-15", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" },
+                    { id: 2, nama_lengkap: "Siti Fulana", nip: "EMP002", divisi: "HRD", departemen: "Umum", jabatan: "HR Manager", jenis_kelamin: "Akhwat", tanggal_bergabung: "2019-05-20", tanggal_akhir_kontrak: "2026-05-20", image: "", pendidikan_terakhir: "S2", status_karyawan: "Tetap" },
+                    { id: 3, nama_lengkap: "Budi Santoso", nip: "EMP003", divisi: "Marketing", departemen: "Bisnis", jabatan: "Staff Marketing", jenis_kelamin: "Ikhwan", tanggal_bergabung: "2023-08-01", tanggal_akhir_kontrak: "2024-08-01", image: "", pendidikan_terakhir: "D3", status_karyawan: "Kontrak" },
+                    { id: 4, nama_lengkap: "Dewi Sartika", nip: "EMP004", divisi: "Finance", departemen: "Keuangan", jabatan: "Staff Finance", jenis_kelamin: "Akhwat", tanggal_bergabung: "2022-03-10", tanggal_akhir_kontrak: "2025-03-10", image: "", pendidikan_terakhir: "S1", status_karyawan: "Tetap" }
+                ];
+            } else if (type === 'info') {
+                return [
+                    { id: 1, type: "Penting", title: "Libur Nasional & Cuti Bersama", date: new Date().toISOString(), summary: "Pengumuman mengenai jadwal libur bulan ini.", detail: "Berikut adalah rincian hari libur..." },
+                    { id: 2, type: "Info", title: "Update Kebijakan Absensi", date: new Date().toISOString(), summary: "Perubahan jam masuk efektif minggu depan.", detail: "Jam masuk berubah menjadi..." }
+                ];
+            } else if (type === 'ebook') {
+                return [
+                    { id: 1, title: "Panduan Karyawan Baru", author: "Tim HRD", pages: 25, deskripsi: "Buku saku untuk onboarding.", link: "#" },
+                    { id: 2, title: "SOP Perusahaan 2024", author: "Management", pages: 120, deskripsi: "Standar Operasional Prosedur lengkap.", link: "#" }
+                ];
+            }
+            return [];
         }
+
+        // --- FETCH DATA ENGINE ---
+        async function fetchAllData() {
+            const dateDisplay = document.getElementById('date-display');
+            if(dateDisplay) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateDisplay.innerText = new Date().toLocaleDateString('id-ID', options);
+            }
+
+            fetchDataGeneric('karyawan', (data) => { 
+                dataKaryawan = data; 
+                if (currentPage === 'beranda' || currentPage === 'direktur') renderPage(currentPage); 
+            });
+            fetchDataGeneric('info', (data) => { 
+                dataInfo = data; 
+                if (currentPage === 'informasi' || currentPage === 'beranda') renderPage(currentPage); 
+            });
+            fetchDataGeneric('ebook', (data) => { 
+                dataEbooks = data.map((item, index) => ({ ...item, color: ebookColors[index % ebookColors.length] })); 
+                if (currentPage === 'ebook' || currentPage === 'beranda') renderPage(currentPage); 
+            });
+        }
+
         async function fetchDataGeneric(type, onSuccess) {
             loadingState[type] = true;
             try {
-                const response = await fetch(`${API_URL}?type=${type}&t=${new Date().getTime()}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 sec timeout
+                const response = await fetch(`${API_URL}?type=${type}&t=${new Date().getTime()}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
                 if (!response.ok) throw new Error("Network error");
                 const data = await response.json();
-                if (type === 'info' && data.length > 0 && (data[0].nip || data[0].nama_lengkap)) { console.warn(`Warning: Data ${type} salah.`); return; }
+                if (type === 'info' && data.length > 0 && (data[0].nip || data[0].nama_lengkap)) { throw new Error("Data Integrity Mismatch"); }
                 if (Array.isArray(data)) onSuccess(data);
-            } catch (e) { console.error(`Gagal memuat ${type}:`, e); } finally {
+            } catch (e) { 
+                console.warn(`Gagal memuat ${type}, menggunakan Data Mock.`, e);
+                if (!isOfflineMode) { isOfflineMode = true; showToast("Mode Demo: Menggunakan data contoh", "bg-orange-600"); }
+                onSuccess(getMockData(type));
+            } finally {
                 loadingState[type] = false;
                 if (type === 'karyawan' && currentPage === 'direktur') renderPage('direktur');
                 if (type === 'info' && currentPage === 'informasi') renderPage('informasi');
                 if (type === 'ebook' && currentPage === 'ebook') renderPage('ebook');
             }
         }
+
         function showToast(message, colorClass = "bg-slate-800") {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -221,12 +358,17 @@
         function renderPage(pageName) {
             currentPage = pageName;
             updateNavStyles();
+            closeMoreMenu(); 
             const content = document.getElementById('app-content');
-            content.innerHTML = '';
+            content.innerHTML = ''; 
             switch(pageName) {
                 case 'beranda': content.innerHTML = getBerandaHTML(); setTimeout(initDashboardCharts, 100); break;
                 case 'informasi': content.innerHTML = getInformasiHTML(); break;
-                case 'direktur': content.innerHTML = getDirekturHTML(); if (loadingState.karyawan) { document.getElementById('employee-list-container').innerHTML = '<div class="flex flex-col justify-center items-center h-64 text-slate-400"><div class="loader mb-3"></div><p>Memuat Data...</p></div>'; } else { updateEmployeeGrid(); } break;
+                case 'direktur': 
+                    content.innerHTML = getDirekturHTML(); 
+                    if (loadingState.karyawan) { document.getElementById('employee-list-container').innerHTML = '<div class="flex flex-col justify-center items-center h-64 text-slate-400"><div class="loader mb-3"></div><p>Memuat Data...</p></div>'; } 
+                    else { updateEmployeeGrid(); } 
+                    break;
                 case 'ebook': content.innerHTML = getEbookHTML(); break;
                 case 'hrd': content.innerHTML = getKontakHRDHTML(); break;
                 case 'generator': content.innerHTML = getGeneratorHTML(); break;
@@ -234,26 +376,55 @@
             lucide.createIcons();
             window.scrollTo(0, 0);
         }
+
         function updateNavStyles() {
-            document.querySelectorAll('.nav-btn').forEach(btn => { const isActive = btn.id === `nav-${currentPage}`; btn.className = `nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'active-tab-nav' : 'inactive-tab-nav'}`; });
+            document.querySelectorAll('.nav-btn').forEach(btn => { if(btn.id) { const isActive = btn.id === `nav-${currentPage}`; btn.className = `nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 ${isActive ? 'active-tab-nav' : 'inactive-tab-nav'}`; }});
             document.querySelectorAll('.sidebar-link').forEach(link => { const isActive = link.id === `sidebar-${currentPage}`; link.className = 'sidebar-link w-full ' + (isActive ? 'sidebar-active' : 'sidebar-inactive'); });
         }
 
-        // --- DASHBOARD ---
+        function openMoreMenu() { const menu = document.getElementById('mobile-more-menu'); if (menu.classList.contains('hidden')) { menu.classList.remove('hidden'); menu.classList.add('fade-in'); } else { menu.classList.add('hidden'); } }
+        function closeMoreMenu() { const menu = document.getElementById('mobile-more-menu'); if(menu) menu.classList.add('hidden'); }
+
+        // --- DASHBOARD SECTION ---
         function getBerandaHTML() {
             const totalKaryawan = dataKaryawan.length;
             const uniqueDivisi = new Set(dataKaryawan.map(d => getProp(d, 'divisi')).filter(Boolean)).size;
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
+            
             const now = new Date();
             const newJoiners = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_bergabung', 'join_date']); if(!dateVal) return false; const joinDate = new Date(dateVal); return joinDate.getMonth() === now.getMonth() && joinDate.getFullYear() === now.getFullYear(); });
+            
             const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = new Date(dateVal); return expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
+            
+            // Re-added Expiring Next Month Logic
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             const expiringNextMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = new Date(dateVal); return expDate.getMonth() === nextMonth.getMonth() && expDate.getFullYear() === nextMonth.getFullYear(); });
+            
             const recentInfo = dataInfo.slice(0, 3);
-            const calendarHTML = generateCalendarHTML();
+            const calendarHTML = generateCalendarHTML(); // Ensure this is used
 
-            return `<div class="space-y-6"><div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Dashboard Karyawan</h2><p class="text-blue-100 text-sm">Ringkasan data statistik kepegawaian periode ini.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="users" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalKaryawan}</h3><p class="text-xs text-slate-500">Total Karyawan</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="building-2" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${uniqueDivisi}</h3><p class="text-xs text-slate-500">Total Divisi</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalIkhwan}</h3><p class="text-xs text-slate-500">Ikhwan (L)</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalAkhwat}</h3><p class="text-xs text-slate-500">Akhwat (P)</p></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3><div class="relative h-64 flex justify-center"><canvas id="genderChart"></canvas></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi</h3><div class="relative h-64 w-full"><canvas id="divisionChart"></canvas></div></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3><div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-x" class="w-4 h-4 text-red-500"></i> Habis Kontrak Bulan Ini</h3><span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringThisMonth.length}</span></div><div class="space-y-3 max-h-32 overflow-y-auto pr-1 no-scrollbar">${expiringThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan ini.</p>' : expiringThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}</div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-clock" class="w-4 h-4 text-orange-500"></i> Habis Kontrak Bulan Depan</h3><span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringNextMonth.length}</span></div><div class="space-y-3 max-h-32 overflow-y-auto pr-1 no-scrollbar">${expiringNextMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan depan.</p>' : expiringNextMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}</div></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i> Bergabung Bulan Ini</h3><span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">${newJoiners.length}</span></div><div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">${newJoiners.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada karyawan baru bulan ini.</p>' : newJoiners.map(emp => `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${getProp(emp,['nama_lengkap','nama'])}</p><p class="text-[10px] text-slate-500 truncate">${getProp(emp,['divisi','division'])} • ${getProp(emp,['jabatan','position'])}</p></div><span class="text-[10px] text-slate-400">${formatDateIndo(getProp(emp,['tanggal_bergabung','join_date']))}</span></div>`).join('')}</div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2">Info Terbaru</h3><div class="space-y-3">${recentInfo.length === 0 ? '<p class="text-sm text-slate-400 italic">Belum ada informasi.</p>' : recentInfo.map(item => { const type = getProp(item, ['type', 'jenis', 'kategori']) || 'Info'; const date = getProp(item, ['date', 'tanggal']); const title = getProp(item, ['title', 'judul']); return `<div onclick="openInfoDetail('${getProp(item, 'id')}')" class="p-3 border rounded-lg hover:bg-slate-50 cursor-pointer"><div class="flex justify-between"><span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${type}</span><span class="text-xs text-slate-400">${formatDateIndo(date)}</span></div><h4 class="text-sm font-bold text-slate-800 mt-1">${title}</h4></div>` }).join('')}</div></div></div></div>`;
+            return `<div class="space-y-6"><div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Dashboard Karyawan</h2><p class="text-blue-100 text-sm">Ringkasan data statistik kepegawaian periode ini.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="users" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalKaryawan}</h3><p class="text-xs text-slate-500">Total Karyawan</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="building-2" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${uniqueDivisi}</h3><p class="text-xs text-slate-500">Total Divisi</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalIkhwan}</h3><p class="text-xs text-slate-500">Ikhwan (L)</p></div><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="user" class="w-5 h-5"></i></div><h3 class="text-2xl font-bold text-slate-800">${totalAkhwat}</h3><p class="text-xs text-slate-500">Akhwat (P)</p></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3><div class="relative h-64 flex justify-center"><canvas id="genderChart"></canvas></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-purple-500"></i> Gender per Divisi</h3><div class="relative h-64 w-full"><canvas id="divisionChart"></canvas></div></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3><div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Habis Kontrak Bulan Ini -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-x" class="w-4 h-4 text-red-500"></i> Habis Kontrak Bulan Ini</h3><span class="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringThisMonth.length}</span></div><div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">${expiringThisMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan ini.</p>' : expiringThisMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}</div></div>
+                
+                <!-- Habis Kontrak Bulan Depan (RESTORED) -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="calendar-clock" class="w-4 h-4 text-orange-500"></i> Habis Kontrak Bulan Depan</h3><span class="bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full font-bold">${expiringNextMonth.length}</span></div><div class="space-y-3 max-h-48 overflow-y-auto pr-1 no-scrollbar">${expiringNextMonth.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Tidak ada karyawan habis kontrak bulan depan.</p>' : expiringNextMonth.map(emp => { const name = getProp(emp, ['nama_lengkap', 'nama']); const div = getProp(emp, ['divisi', 'division']); const end = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak']); return `<div class="flex items-center justify-between gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><div class="min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${name}</p><p class="text-[10px] text-slate-500 truncate">${div}</p></div><span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">${formatDateIndo(end)}</span></div>` }).join('')}</div></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <!-- Bergabung Bulan Ini -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i> Bergabung Bulan Ini</h3><span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">${newJoiners.length}</span></div><div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">${newJoiners.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada karyawan baru bulan ini.</p>' : newJoiners.map(emp => `<div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition border border-transparent hover:border-slate-100"><img src="${getDirectDriveUrl(getProp(emp,['image','foto']))}" class="w-10 h-10 rounded-full bg-slate-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'"><div class="flex-1 min-w-0"><p class="text-sm font-semibold text-slate-800 truncate">${getProp(emp,['nama_lengkap','nama'])}</p><p class="text-[10px] text-slate-500 truncate">${getProp(emp,['divisi','division'])} • ${getProp(emp,['jabatan','position'])}</p></div><span class="text-[10px] text-slate-400">${formatDateIndo(getProp(emp,['tanggal_bergabung','join_date']))}</span></div>`).join('')}</div></div>
+                
+                 <!-- Recent Info (RESTORED) -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="bell" class="w-4 h-4 text-blue-500"></i> Info Terbaru</h3><button onclick="renderPage('informasi')" class="text-[10px] text-blue-600 font-bold hover:underline">Lihat Semua</button></div><div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">${recentInfo.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada informasi.</p>' : recentInfo.map(item => { const type = getProp(item, ['type', 'jenis', 'kategori']) || 'Info'; const date = getProp(item, ['date', 'tanggal']); const title = getProp(item, ['title', 'judul']); return `<div onclick="openInfoDetail('${getProp(item, 'id')}')" class="p-3 border rounded-lg hover:bg-slate-50 cursor-pointer"><div class="flex justify-between"><span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">${type}</span><span class="text-[10px] text-slate-400">${formatDateIndo(date)}</span></div><h4 class="text-sm font-bold text-slate-800 mt-1 truncate">${title}</h4></div>` }).join('')}</div></div>
+                
+                <!-- Calendar (RESTORED) -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm"><h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender Kegiatan</h3>${calendarHTML}</div>
+            </div>
+            </div>`;
         }
 
         function generateCalendarHTML() {
@@ -264,42 +435,61 @@
             const firstDay = new Date(year, month, 1).getDay(); 
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const today = now.getDate();
+            // Assuming dataInfo has dates for events
             const eventDates = dataInfo.map(item => { const d = new Date(getProp(item, ['date', 'tanggal'])); if (!isNaN(d.getTime()) && d.getMonth() === month && d.getFullYear() === year) return d.getDate(); return null; }).filter(Boolean);
-            let html = `<div class="text-center mb-4 text-sm font-semibold text-slate-600">${monthNames[month]} ${year}</div><div class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-slate-400 mb-2"><div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div></div><div class="grid grid-cols-7 gap-1 text-center">`;
+            
+            let html = `<div class="text-center mb-4 text-sm font-bold text-slate-600 bg-slate-50 py-2 rounded-lg">${monthNames[month]} ${year}</div><div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wide"><div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div></div><div class="grid grid-cols-7 gap-1 text-center text-xs">`;
+            
             for (let i = 0; i < firstDay; i++) html += `<div></div>`;
-            for (let day = 1; day <= daysInMonth; day++) { let classes = "calendar-day hover:bg-blue-50 transition cursor-default"; if (day === today) classes += " calendar-today"; if (eventDates.includes(day)) classes += " calendar-event"; html += `<div class="${classes}">${day}</div>`; }
-            html += `</div><div class="mt-4 flex items-center justify-center gap-4 text-[10px] text-slate-400"><div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-600"></div> Hari Ini</div><div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-600 opacity-50"></div> Agenda</div></div>`;
+            
+            for (let day = 1; day <= daysInMonth; day++) { 
+                let classes = "calendar-day hover:bg-blue-50 transition cursor-default font-medium text-slate-600"; 
+                if (day === today) classes += " calendar-today"; 
+                if (eventDates.includes(day)) classes += " calendar-event"; 
+                html += `<div class="${classes}">${day}</div>`; 
+            }
+            html += `</div><div class="mt-4 flex items-center justify-center gap-4 text-[10px] text-slate-400 font-medium"><div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-600"></div> Hari Ini</div><div class="flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-blue-600 opacity-50"></div> Agenda</div></div>`;
             return html;
         }
 
         function initDashboardCharts() {
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
+            
+            // Gender & Division Stats
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
             const totalAkhwat = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat').length;
             const divisions = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division']) ? String(getProp(d, ['divisi', 'division'])).trim() : null).filter(Boolean))].sort();
             const malePerDiv = divisions.map(div => dataKaryawan.filter(d => { const dDiv = getProp(d, ['divisi', 'division']); return dDiv && String(dDiv).trim() === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan'; }).length);
             const femalePerDiv = divisions.map(div => dataKaryawan.filter(d => { const dDiv = getProp(d, ['divisi', 'division']); return dDiv && String(dDiv).trim() === div && normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'akhwat'; }).length);
+
+            // Education Stats
             const departments = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const normalizeEdu = (edu) => { if (!edu) return 'Lainnya'; edu = String(edu).toUpperCase().trim(); if (['S3', 'S2', 'DOKTOR', 'MASTER', 'PASCA'].some(k => edu.includes(k))) return 'Pascasarjana'; if (['S1', 'D4', 'SARJANA', 'BACHELOR'].some(k => edu.includes(k) || edu === 'S1')) return 'Sarjana'; if (['D3', 'D2', 'D1', 'DIPLOMA'].some(k => edu.includes(k))) return 'Diploma'; if (['SMA', 'SMK', 'MA'].some(k => edu.includes(k))) return 'SMA/K'; if (['SMP', 'SD'].some(k => edu.includes(k))) return 'Dasar'; return 'Lainnya'; };
             const eduGroups = ['Pascasarjana', 'Sarjana', 'Diploma', 'SMA/K', 'Dasar', 'Lainnya'];
             const eduColors = { 'Pascasarjana': '#1e3a8a', 'Sarjana': '#2563eb', 'Diploma': '#60a5fa', 'SMA/K': '#94a3b8', 'Dasar': '#cbd5e1', 'Lainnya': '#e2e8f0' };
             const eduDatasets = eduGroups.map((group) => { return { label: group, data: departments.map(dept => dataKaryawan.filter(d => { const empDept = getProp(d, ['departemen', 'department']); const empEdu = getProp(d, ['pendidikan_terakhir', 'education']); return empDept === dept && normalizeEdu(empEdu) === group; }).length), backgroundColor: eduColors[group], barPercentage: 0.6, categoryPercentage: 0.8 }; });
 
+            // Cleanup
             if (genderChartInstance) genderChartInstance.destroy();
             if (divisionChartInstance) divisionChartInstance.destroy();
             if (eduChartInstance) eduChartInstance.destroy();
 
+            // Render 1: Gender
             const ctxGender = document.getElementById('genderChart').getContext('2d');
             genderChartInstance = new Chart(ctxGender, { type: 'doughnut', data: { labels: ['Ikhwan', 'Akhwat'], datasets: [{ data: [totalIkhwan, totalAkhwat], backgroundColor: ['#10b981', '#ec4899'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+            
+            // Render 2: Division
             const ctxDiv = document.getElementById('divisionChart').getContext('2d');
             const divChartContainer = document.getElementById('divisionChart').parentNode;
             if (divisions.length > 0) { const newHeight = Math.max(300, (divisions.length * 25 + 50)); divChartContainer.style.height = newHeight + 'px'; }
             divisionChartInstance = new Chart(ctxDiv, { type: 'bar', data: { labels: divisions, datasets: [ { label: 'Ikhwan', data: malePerDiv, backgroundColor: '#10b981', stack: 'Stack 0' }, { label: 'Akhwat', data: femalePerDiv, backgroundColor: '#ec4899', stack: 'Stack 0' } ] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { stacked: true }, y: { stacked: true, ticks: { font: { size: 10 }, autoSkip: false } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } } } });
+
+            // Render 3: Education (RESTORED)
             const ctxEdu = document.getElementById('eduChart').getContext('2d');
             eduChartInstance = new Chart(ctxEdu, { type: 'bar', data: { labels: departments, datasets: eduDatasets }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', scales: { x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1, font: { size: 9 } }, grid: { color: '#f1f5f9' } }, y: { stacked: true, ticks: { font: { size: 10, weight: '500' } }, grid: { display: false } } }, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, usePointStyle: true } }, tooltip: { callbacks: { footer: (tooltipItems) => { let sum = 0; tooltipItems.forEach(function(tooltipItem) { sum += tooltipItem.parsed.x; }); return 'Total: ' + sum + ' Org'; } } } } } });
         }
 
-        // --- INFORMASI & EBOOK ---
+        // --- INFO & EBOOK SECTIONS ---
         function getInformasiHTML() {
             if (loadingState.info) return '<div class="flex justify-center p-10"><div class="loader"></div></div>';
             if (dataInfo.length === 0) return '<div class="text-center p-10 text-slate-400">Belum ada informasi.</div>';
@@ -327,6 +517,7 @@
             return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="library" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Ebook Panduan</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
         }
 
+        // --- DIRECTORY SECTION (Reverted to Original) ---
         function getDirekturHTML() {
             const depts = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
             const divs = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
@@ -368,7 +559,7 @@
                         const gelar = getProp(d, ['gelar', 'title']) || '';
                         const jab = getProp(d, ['jabatan', 'position']);
                         const nip = getProp(d, ['nip']);
-                        return `<div onclick="openDetail('${getProp(d, 'id')}')" class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col items-center gap-3 hover:shadow-md hover:border-blue-300 transition cursor-pointer group"><div class="relative w-full aspect-[3/4] overflow-hidden rounded-lg"><img src="${getDirectDriveUrl(img)}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'"></div><div class="w-full text-center"><h3 class="font-bold text-slate-800 text-sm truncate">${name}, ${gelar}</h3><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider truncate mb-1">${jab}</p><span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full inline-block">NIP: ${nip}</span></div></div>`;
+                        return `<div onclick="openDetail('${getProp(d, 'id')}')" class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col items-center gap-3 hover:shadow-md hover:border-blue-300 transition cursor-pointer group"><div class="relative w-full aspect-[3/4] overflow-hidden rounded-lg"><img src="${getDirectDriveUrl(img)}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"></div><div class="w-full text-center"><h3 class="font-bold text-slate-800 text-sm truncate">${name}, ${gelar}</h3><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider truncate mb-1">${jab}</p><span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full inline-block">NIP: ${nip}</span></div></div>`;
                     }).join('');
                     contentHTML += `<div class="mb-6 fade-in"><h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 pl-1 border-l-4 border-blue-500 ml-1">Divisi ${divisiName}</h3><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">${cardsHTML}</div></div>`;
                 });
@@ -377,13 +568,14 @@
             lucide.createIcons();
         }
 
+        // --- TOOLS & GENERATOR (Restored Full Features) ---
         function getGeneratorHTML() {
             return `<div class="max-w-2xl mx-auto space-y-8 fade-in"><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center"><i data-lucide="calculator" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Kalkulator Zakat & PPh21</h2><p class="text-xs text-slate-500">Estimasi kewajiban bulanan Anda.</p></div></div><div class="space-y-4"><div><label class="block text-sm font-medium text-slate-700 mb-2">Penghasilan Bruto (Sebulan):</label><input type="number" id="calc-gaji" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm" placeholder="Contoh: 5000000"></div><div><label class="block text-sm font-medium text-slate-700 mb-2">Status Pernikahan (Untuk PPh21):</label><select id="calc-status" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm text-slate-600"><option value="TK0">TK/0 (Tidak Kawin, Tanpa Tanggungan)</option><option value="TK1">TK/1 (Tidak Kawin, 1 Tanggungan)</option><option value="K0">K/0 (Kawin, Tanpa Tanggungan)</option><option value="K1">K/1 (Kawin, 1 Tanggungan)</option><option value="K2">K/2 (Kawin, 2 Tanggungan)</option><option value="K3">K/3 (Kawin, 3 Tanggungan)</option></select></div><button onclick="calculateFinance()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-medium">Hitung Estimasi</button><div id="calc-result" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3"><div class="flex justify-between items-center pb-2 border-b border-slate-200"><span class="text-sm text-slate-600">Zakat Profesi (2.5%)</span><span id="res-zakat" class="font-bold text-emerald-600">Rp 0</span></div><div class="flex justify-between items-center"><span class="text-sm text-slate-600">Estimasi PPh21 (TER A)</span><span id="res-tax" class="font-bold text-red-500">Rp 0</span></div><p class="text-[10px] text-slate-400 mt-2 text-center">*Perhitungan PPh21 menggunakan skema TER (Tarif Efektif Rata-rata) bulanan terbaru.</p></div></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="align-left" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Generator Teks</h2><p class="text-xs text-slate-500">Format teks (tebal, miring, paragraf) untuk Info & Ebook.</p></div></div><div class="space-y-4"><div><label class="block text-sm font-medium text-slate-700 mb-2">Editor:</label><div class="flex flex-wrap gap-1 mb-2 p-1 bg-slate-50 border border-slate-200 rounded-lg"><button onclick="formatText('b')" class="p-2 hover:bg-white rounded transition" title="Tebal"><i data-lucide="bold" class="w-4 h-4"></i></button><button onclick="formatText('i')" class="p-2 hover:bg-white rounded transition" title="Miring"><i data-lucide="italic" class="w-4 h-4"></i></button><button onclick="formatText('u')" class="p-2 hover:bg-white rounded transition" title="Garis Bawah"><i data-lucide="underline" class="w-4 h-4"></i></button><div class="w-px h-6 bg-slate-300 mx-1 self-center"></div><button onclick="formatText('left')" class="p-2 hover:bg-white rounded transition" title="Rata Kiri"><i data-lucide="align-left" class="w-4 h-4"></i></button><button onclick="formatText('center')" class="p-2 hover:bg-white rounded transition" title="Rata Tengah"><i data-lucide="align-center" class="w-4 h-4"></i></button><button onclick="formatText('right')" class="p-2 hover:bg-white rounded transition" title="Rata Kanan"><i data-lucide="align-right" class="w-4 h-4"></i></button><button onclick="formatText('justify')" class="p-2 hover:bg-white rounded transition" title="Justify"><i data-lucide="align-justify" class="w-4 h-4"></i></button></div><textarea id="genInput" rows="5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ketik teks di sini..."></textarea></div><div class="flex gap-2"><button onclick="runGenerator()" class="flex-1 bg-indigo-600 text-white px-4 py-2.5 rounded-xl hover:bg-indigo-700 text-sm font-medium">Generate HTML</button><button onclick="document.getElementById('genInput').value=''; document.getElementById('genOutput').value='';" class="px-4 py-2.5 bg-slate-100 rounded-xl hover:bg-slate-200"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><textarea id="genOutput" rows="3" readonly class="w-full p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800" onclick="this.select()"></textarea><button onclick="copyGenResult()" class="w-full bg-emerald-600 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-700 text-sm font-medium">Salin Hasil</button></div></div><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4"><div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center"><i data-lucide="image" class="w-5 h-5"></i></div><div><h2 class="text-lg font-bold text-slate-800">Generator Link Gambar</h2><p class="text-xs text-slate-500">Ubah link Google Drive menjadi Direct Link.</p></div></div><div class="space-y-4"><input type="text" id="driveInput" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 text-sm" placeholder="Paste link Google Drive..."><button onclick="runDriveGenerator()" class="w-full bg-pink-600 text-white px-4 py-2.5 rounded-xl hover:bg-pink-700 text-sm font-medium">Convert Link</button><div id="driveResultContainer" class="hidden space-y-4"><div class="flex gap-2"><input type="text" id="driveOutput" readonly class="flex-1 p-3 bg-emerald-50 border border-emerald-100 rounded-xl font-mono text-xs text-emerald-800" onclick="this.select()"><button onclick="copyDriveResult()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700"><i data-lucide="copy" class="w-4 h-4"></i></button></div><div class="border border-slate-100 rounded-xl p-4 text-center"><p class="text-xs text-slate-400 mb-2">Preview:</p><img id="drivePreview" src="" class="max-h-48 mx-auto rounded-lg shadow-sm" alt="Preview"></div></div></div></div></div>`;
         }
 
         function calculateFinance() {
             const gaji = parseFloat(document.getElementById('calc-gaji').value) || 0;
-            const status = document.getElementById('calc-status').value;
+            if (gaji <= 0) { showToast("Masukkan nominal gaji.", "bg-red-600"); return; }
             const zakat = gaji * 0.025;
             let taxRate = 0;
             if (gaji <= 5400000) taxRate = 0; else if (gaji <= 5650000) taxRate = 0.0025; else if (gaji <= 5950000) taxRate = 0.005; else if (gaji <= 6300000) taxRate = 0.0075; else if (gaji <= 6750000) taxRate = 0.01; else if (gaji <= 7500000) taxRate = 0.015; else if (gaji <= 8550000) taxRate = 0.02; else if (gaji <= 9650000) taxRate = 0.025; else if (gaji <= 11050000) taxRate = 0.03; else taxRate = 0.05; 
@@ -393,6 +585,7 @@
             document.getElementById('calc-result').classList.remove('hidden');
         }
 
+        // --- GENERATOR FUNCTIONS (Restored) ---
         function runGenerator() {
             const input = document.getElementById('genInput').value;
             if(!input) return;
@@ -425,7 +618,6 @@
             }
             input.value = text.substring(0, start) + formatted + text.substring(end);
         }
-
         function runDriveGenerator() {
             const input = document.getElementById('driveInput').value;
             if(!input) return;
@@ -451,10 +643,7 @@
             navigator.clipboard.writeText(copyText.value).then(() => { showToast("Link disalin!", "bg-emerald-600"); });
         }
 
-        function getKontakHRDHTML() {
-             return `<div class="space-y-6 fade-in"><div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="user-cog" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Kepegawaian</h3><p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p><a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100"><i data-lucide="wallet" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Payroll</h3><p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p><a href="#" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div></div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Informasi Kantor</h3></div><div class="p-5 space-y-4"><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Jam Operasional</p><p class="text-xs text-slate-500 mt-0.5">Senin - Jumat, 08.00 - 16.00 WIB</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0"><i data-lucide="map-pin" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Lokasi Kantor</p><p class="text-xs text-slate-500 mt-0.5">Gedung Utama Lt. 2, Ruang 204</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0"><i data-lucide="mail" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Email Resmi</p><p class="text-xs text-slate-500 mt-0.5">hrd@organisasi.id</p></div></div></div></div></div>`;
-        }
-
+        // --- TAB & FILTER LOGIC (Restored Simple Logic) ---
         function switchDirectorTab(tab) {
             currentDirectorTab = tab;
             const btnIkhwan = document.getElementById('btn-ikhwan');
@@ -488,7 +677,7 @@
             const date = getProp(emp, ['tanggal_bergabung', 'join_date']);
             const img = getProp(emp, ['image', 'foto']);
 
-            return `<div class="text-center"><div id="id-card-preview" class="w-full max-w-[320px] mx-auto id-card-bg rounded-2xl shadow-xl overflow-hidden text-white relative h-[500px] flex flex-col"><div class="id-card-pattern"></div><div class="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-white/10 rounded-full"></div><div class="p-6 text-center z-10"><h2 class="text-lg font-bold tracking-widest uppercase">Portal Organisasi</h2><p class="text-[10px] opacity-80 tracking-widest">MEMBER CARD</p></div><div class="flex justify-center z-10 mt-2"><div class="w-32 h-32 rounded-full border-4 border-white/30 p-1 bg-white/10 backdrop-blur-sm"><img src="${getDirectDriveUrl(img)}" class="w-full h-full rounded-full object-cover bg-slate-200"></div></div><div class="flex-1 flex flex-col justify-center items-center z-10 p-4"><h1 class="text-xl font-bold mb-1">${name}</h1><p class="text-sm bg-white/20 px-3 py-1 rounded-full font-medium mb-4">${jab}</p><div class="w-full grid grid-cols-2 gap-2 text-xs text-left px-4"><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">ID Number</span><span class="font-mono font-bold">${nip}</span></div><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">Divisi</span><span class="font-bold">${div}</span></div><div class="bg-white/10 p-2 rounded col-span-2"><span class="block opacity-60 text-[9px] uppercase">Bergabung Sejak</span><span class="font-bold">${formatDateIndo(date)}</span></div></div></div><div class="bg-black/20 p-3 text-[10px] text-center z-10">www.portalorganisasi.id</div></div><button onclick="window.print()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"><i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF</button></div>`;
+            return `<div class="text-center"><div id="id-card-preview" class="w-full max-w-[320px] mx-auto id-card-bg rounded-2xl shadow-xl overflow-hidden text-white relative h-[500px] flex flex-col"><div class="id-card-pattern"></div><div class="absolute bottom-[-20px] left-[-20px] w-24 h-24 bg-white/10 rounded-full"></div><div class="p-6 text-center z-10"><h2 class="text-lg font-bold tracking-widest uppercase">Portal Organisasi</h2><p class="text-[10px] opacity-80 tracking-widest">MEMBER CARD</p></div><div class="flex justify-center z-10 mt-2"><div class="w-32 h-32 rounded-full border-4 border-white/30 p-1 bg-white/10 backdrop-blur-sm"><img src="${getDirectDriveUrl(img)}" class="w-full h-full rounded-full object-cover bg-slate-200" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"></div></div><div class="flex-1 flex flex-col justify-center items-center z-10 p-4"><h1 class="text-xl font-bold mb-1">${name}</h1><p class="text-sm bg-white/20 px-3 py-1 rounded-full font-medium mb-4">${jab}</p><div class="w-full grid grid-cols-2 gap-2 text-xs text-left px-4"><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">ID Number</span><span class="font-mono font-bold">${nip}</span></div><div class="bg-white/10 p-2 rounded"><span class="block opacity-60 text-[9px] uppercase">Divisi</span><span class="font-bold">${div}</span></div><div class="bg-white/10 p-2 rounded col-span-2"><span class="block opacity-60 text-[9px] uppercase">Bergabung Sejak</span><span class="font-bold">${formatDateIndo(date)}</span></div></div></div><div class="bg-black/20 p-3 text-[10px] text-center z-10">www.portalorganisasi.id</div></div><button onclick="window.print()" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full shadow-lg hover:bg-blue-700 transition flex items-center gap-2 mx-auto"><i data-lucide="printer" class="w-4 h-4"></i> Cetak / Simpan PDF</button></div>`;
         }
 
         function openDetail(id) {
@@ -510,11 +699,8 @@
             const bpjsKes = getProp(emp, ['bpjs_kesehatan', 'bpjs_kes']) || '-';
             const bpjsKet = getProp(emp, ['bpjs_ketenagakerjaan', 'bpjs_tk']) || '-';
             const img = getProp(emp, ['image', 'foto']);
-            
-            // NEW FIELDS
             const status = getProp(emp, ['status_karyawan', 'status', 'employee_status']) || '-';
             const contractEnd = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak', 'contract_end']);
-
             const formattedDate = formatDateIndo(date);
             const duration = hitungMasaKerja(date);
 
@@ -525,7 +711,7 @@
                     <button onclick="switchModalTab('idcard')" id="tab-idcard" class="pb-2 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-600">ID Card Digital</button>
                 </div>
                 <div id="content-info">
-                    <div class="flex flex-col items-center text-center mb-6"><img src="${getDirectDriveUrl(img)}" class="w-32 aspect-[3/4] rounded-xl border-4 border-white shadow-lg mb-3 object-cover bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'"><h2 class="text-xl font-bold text-slate-800">${name}, <span class="text-base font-medium text-slate-500">${gelar}</span></h2><p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mt-1">${jab}</p><span class="mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">NIP: ${nip}</span></div>
+                    <div class="flex flex-col items-center text-center mb-6"><img src="${getDirectDriveUrl(img)}" class="w-32 aspect-[3/4] rounded-xl border-4 border-white shadow-lg mb-3 object-cover bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><h2 class="text-xl font-bold text-slate-800">${name}, <span class="text-base font-medium text-slate-500">${gelar}</span></h2><p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mt-1">${jab}</p><span class="mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">NIP: ${nip}</span></div>
                     <div class="space-y-4">
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Departemen</p><p class="font-medium text-slate-700">${dept}</p></div>
@@ -549,14 +735,11 @@
             if (!item) return;
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
-            
             const type = getProp(item, ['type', 'jenis', 'kategori']);
             const title = getProp(item, ['title', 'judul']);
             const date = getProp(item, ['date', 'tanggal']);
             const summary = getProp(item, ['summary', 'ringkasan', 'deskripsi_singkat']);
             const detail = getProp(item, ['detail', 'isi', 'konten']) || 'Tidak ada informasi tambahan.';
-            
-            // Handle newlines by replacing with <br>
             const detailHtml = detail.replace(/\n/g, '<br>');
 
             modalContent.innerHTML = `
@@ -573,25 +756,14 @@
             if (!book) return;
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
-            
             const title = getProp(book, ['title', 'judul', 'judul_buku']);
             const author = getProp(book, ['author', 'penulis', 'pengarang']);
             const pages = getProp(book, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman']);
             const desc = getProp(book, ['deskripsi', 'sinopsis', 'ringkasan']) || 'Tidak ada deskripsi.';
             const link = getProp(book, ['link_download', 'link', 'url']);
-            
-            // Handle newlines by replacing with <br>
             const descHtml = desc.replace(/\n/g, '<br>');
-
-            const downloadBtn = link 
-                ? `<a href="${link}" target="_blank" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 font-medium shadow-lg shadow-blue-200"><i data-lucide="download" class="w-5 h-5"></i> Download PDF</a>`
-                : `<button disabled class="w-full bg-slate-300 text-slate-500 py-3 rounded-xl flex items-center justify-center gap-2 font-medium cursor-not-allowed">Link Tidak Tersedia</button>`;
-
-            modalContent.innerHTML = `
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-50"><i data-lucide="x" class="w-6 h-6"></i></button>
-                <div class="flex flex-col items-center mb-6"><div class="w-24 h-32 ${book.color} rounded-lg flex items-center justify-center shadow-lg mb-4 transform hover:scale-105 transition-transform duration-300"><i data-lucide="book" class="w-10 h-10 opacity-80"></i></div><h2 class="text-xl font-bold text-slate-800 text-center">${title}</h2><p class="text-sm text-blue-600 font-medium mt-1">${author}</p><span class="text-xs text-slate-400 mt-2 bg-slate-50 px-2 py-1 rounded">${pages} Halaman</span></div>
-                <div class="bg-slate-50 p-4 rounded-xl mb-6"><h4 class="font-bold text-slate-700 text-sm mb-2">Sinopsis</h4><p class="text-sm text-slate-600 leading-relaxed">${descHtml}</p></div>
-                ${downloadBtn}`;
+            const downloadBtn = link ? `<a href="${link}" target="_blank" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 font-medium shadow-lg shadow-blue-200"><i data-lucide="download" class="w-5 h-5"></i> Download PDF</a>` : `<button disabled class="w-full bg-slate-300 text-slate-500 py-3 rounded-xl flex items-center justify-center gap-2 font-medium cursor-not-allowed">Link Tidak Tersedia</button>`;
+            modalContent.innerHTML = `<button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-50"><i data-lucide="x" class="w-6 h-6"></i></button><div class="flex flex-col items-center mb-6"><div class="w-24 h-32 ${book.color} rounded-lg flex items-center justify-center shadow-lg mb-4 transform hover:scale-105 transition-transform duration-300"><i data-lucide="book" class="w-10 h-10 opacity-80"></i></div><h2 class="text-xl font-bold text-slate-800 text-center">${title}</h2><p class="text-sm text-blue-600 font-medium mt-1">${author}</p><span class="text-xs text-slate-400 mt-2 bg-slate-50 px-2 py-1 rounded">${pages} Halaman</span></div><div class="bg-slate-50 p-4 rounded-xl mb-6"><h4 class="font-bold text-slate-700 text-sm mb-2">Sinopsis</h4><p class="text-sm text-slate-600 leading-relaxed">${descHtml}</p></div>${downloadBtn}`;
             modal.classList.remove('hidden');
             lucide.createIcons();
         }
@@ -601,7 +773,6 @@
             const idCardContent = document.getElementById('content-idcard');
             const tabInfo = document.getElementById('tab-info');
             const tabIdCard = document.getElementById('tab-idcard');
-
             if (tab === 'info') {
                 infoContent.classList.remove('hidden');
                 idCardContent.classList.add('hidden');
@@ -616,11 +787,12 @@
         }
 
         function closeModal() { document.getElementById('global-modal').classList.add('hidden'); }
-
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; const installBtn = document.getElementById('installPWA'); if(installBtn) { installBtn.classList.remove('hidden'); installBtn.addEventListener('click', () => { deferredPrompt.prompt(); deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; installBtn.classList.add('hidden'); }); }); } });
-        if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./service-worker.js').then((reg) => console.log('Service worker registered.', reg)).catch((err) => console.log('Service worker registration failed.', err)); }); }
-
+        // --- HRD SERVICE ---
+        function getKontakHRDHTML() {
+             return `<div class="space-y-6 fade-in"><div class="bg-gradient-to-r from-pink-600 to-rose-500 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden"><div class="relative z-10"><h2 class="text-2xl font-bold mb-1">Layanan HRD</h2><p class="text-pink-100 text-sm">Pusat bantuan kepegawaian & administrasi.</p></div><div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 border border-blue-100"><i data-lucide="user-cog" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Kepegawaian</h3><p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p><a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div><div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition flex items-start gap-4"><div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-100"><i data-lucide="wallet" class="w-6 h-6"></i></div><div class="flex-1"><h3 class="font-bold text-slate-800">Admin Payroll</h3><p class="text-xs text-slate-500 mb-3">Gaji, Tunjangan, & Reimbursement</p><a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition w-full justify-center sm:w-auto"><i data-lucide="message-circle" class="w-4 h-4"></i> Chat WhatsApp</a></div></div></div><div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"><div class="p-4 border-b border-slate-100 bg-slate-50/50"><h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Informasi Kantor</h3></div><div class="p-5 space-y-4"><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0"><i data-lucide="clock" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Jam Operasional</p><p class="text-xs text-slate-500 mt-0.5">Senin - Jumat, 08.00 - 16.00 WIB</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0"><i data-lucide="map-pin" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Lokasi Kantor</p><p class="text-xs text-slate-500 mt-0.5">Gedung Utama Lt. 2, Ruang 204</p></div></div><div class="flex gap-4 items-start"><div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 shrink-0"><i data-lucide="mail" class="w-4 h-4"></i></div><div><p class="text-sm font-semibold text-slate-800">Email Resmi</p><p class="text-xs text-slate-500 mt-0.5">hrd@organisasi.id</p></div></div></div></div></div>`;
+        }
+        
+        // --- INIT ---
         document.addEventListener("DOMContentLoaded", () => {
             fetchAllData();
             renderPage('beranda');
