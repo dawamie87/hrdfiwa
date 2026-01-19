@@ -276,6 +276,10 @@
         let currentPage = 'beranda';
         let currentDirectorTab = 'ikhwan';
         let searchKeyword = '', sortOrder = 'name_asc', filterDept = '', filterDiv = '';
+        
+        // NEW: State for Rekap Filter
+        let rekapSearchKeyword = '', rekapFilterDept = '', rekapFilterDiv = '';
+
         let genderChartInstance = null, divisionChartInstance = null, eduChartInstance = null;
 
         // --- PASSWORD LOGIC ---
@@ -631,7 +635,10 @@
                     if (loadingState.karyawan) { document.getElementById('employee-list-container').innerHTML = '<div class="flex flex-col justify-center items-center h-64 text-slate-400"><div class="loader mb-3"></div><p>Memuat Data...</p></div>'; } 
                     else { updateEmployeeGrid(); } 
                     break;
-                case 'rekap': content.innerHTML = getRekapHTML(); break;
+                case 'rekap': 
+                    content.innerHTML = getRekapHTML(); 
+                    updateRekapTable(); // Init table with all data
+                    break;
                 case 'ebook': content.innerHTML = getEbookHTML(); break;
                 case 'hrd': content.innerHTML = getKontakHRDHTML(); break;
                 case 'generator': content.innerHTML = getGeneratorHTML(); break;
@@ -953,50 +960,54 @@
             return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="library" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Ebook Panduan</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
         }
 
-        // --- REKAP ABSENSI HTML (NEW) ---
+        // --- REKAP ABSENSI LOGIC & HTML (UPDATED WITH FILTERS) ---
+        function handleRekapSearch(val) { rekapSearchKeyword = val; updateRekapTable(); }
+        function handleRekapFilter(type, val) {
+            if (type === 'dept') rekapFilterDept = val;
+            if (type === 'div') rekapFilterDiv = val;
+            updateRekapTable();
+        }
+
         function getRekapHTML() {
             // Logic for Academic Year (Juli - Juni)
             const today = new Date();
             const currentMonth = today.getMonth(); // 0-11
             const currentYear = today.getFullYear();
-            
-            // If month is Jan-Jun, academic year starts last year. If Jul-Dec, starts this year.
             let academicYearStart = currentMonth < 6 ? currentYear - 1 : currentYear;
             let academicYearEnd = academicYearStart + 1;
             const academicYearLabel = `${academicYearStart}/${academicYearEnd}`;
 
-            // Generate Mock Data for Table if it doesn't exist
-            // Using existing dataKaryawan as base
-            const rekapData = dataKaryawan.map(emp => {
-                // Generate random stats for demo purposes
-                return {
-                    name: getProp(emp, ['nama_lengkap', 'name']),
-                    div: getProp(emp, ['divisi', 'division']),
-                    normatif: parseInt(getProp(emp, ['cuti_normatif', 'normatif']) || 0),
-                    tahunan: parseInt(getProp(emp, ['cuti_tahunan', 'tahunan']) || 0),
-                    sakit: parseInt(getProp(emp, ['sakit']) || 0),
-                    izin: parseInt(getProp(emp, ['izin']) || 0),
-                    terlambat: parseInt(getProp(emp, ['terlambat']) || 0),
-                    pulangAwal: parseInt(getProp(emp, ['pulang_awal', 'pulang_cepat']) || 0),
-                    mangkir: parseInt(getProp(emp, ['mangkir']) || 0)
-                };
-            });
-
-            const rowsHTML = rekapData.length > 0 ? rekapData.map((d, index) => `
-                <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0 transition">
-                    <td class="px-4 py-3 text-sm text-slate-700 font-medium">${d.name}<br><span class="text-[10px] text-slate-400 font-normal">${d.div}</span></td>
-                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.normatif}</td>
-                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.tahunan}</td>
-                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.sakit}</td>
-                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.izin}</td>
-                    <td class="px-4 py-3 text-center text-sm text-orange-600 font-medium bg-orange-50">${d.terlambat}</td>
-                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.pulangAwal}</td>
-                    <td class="px-4 py-3 text-center text-sm text-red-600 font-bold bg-red-50">${d.mangkir}</td>
-                </tr>
-            `).join('') : '<tr><td colspan="8" class="text-center py-4 text-slate-400">Tidak ada data karyawan.</td></tr>';
+            // Populate Dropdowns logic
+            const depts = [...new Set(dataKaryawan.map(d => getProp(d, ['departemen', 'department'])).filter(Boolean))].sort();
+            const divs = [...new Set(dataKaryawan.map(d => getProp(d, ['divisi', 'division'])).filter(Boolean))].sort();
+            
+            const deptOptions = depts.map(d => `<option value="${d}" ${rekapFilterDept === d ? 'selected' : ''}>${d}</option>`).join('');
+            const divOptions = divs.map(d => `<option value="${d}" ${rekapFilterDiv === d ? 'selected' : ''}>${d}</option>`).join('');
 
             return `
             <div class="space-y-6 fade-in">
+                <!-- Filters Section (New) -->
+                <div class="flex flex-wrap items-center gap-2 text-sm bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="relative flex-1 min-w-[200px]">
+                        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                        <input type="text" oninput="handleRekapSearch(this.value)" value="${rekapSearchKeyword}" class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm placeholder:text-slate-400" placeholder="Cari karyawan...">
+                    </div>
+                    <div class="relative w-auto">
+                        <select onchange="handleRekapFilter('dept', this.value)" class="pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none cursor-pointer">
+                            <option value="">Dept: Semua</option>
+                            ${deptOptions}
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                    </div>
+                    <div class="relative w-auto">
+                        <select onchange="handleRekapFilter('div', this.value)" class="pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none cursor-pointer">
+                            <option value="">Div: Semua</option>
+                            ${divOptions}
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
                 <!-- Header Card -->
                 <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
@@ -1012,23 +1023,23 @@
                     <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div>
                 </div>
 
-                <!-- Stats Summary (Mock) -->
+                <!-- Stats Summary -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <p class="text-xs text-slate-500 mb-1">Total Terlambat</p>
-                        <h3 class="text-2xl font-bold text-orange-500">${rekapData.reduce((a,b)=>a+b.terlambat,0)}</h3>
+                        <h3 class="text-2xl font-bold text-orange-500" id="rekap-total-terlambat">0</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <p class="text-xs text-slate-500 mb-1">Total Sakit</p>
-                        <h3 class="text-2xl font-bold text-blue-500">${rekapData.reduce((a,b)=>a+b.sakit,0)}</h3>
+                        <h3 class="text-2xl font-bold text-blue-500" id="rekap-total-sakit">0</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <p class="text-xs text-slate-500 mb-1">Total Cuti</p>
-                        <h3 class="text-2xl font-bold text-emerald-500">${rekapData.reduce((a,b)=>a+b.tahunan + b.normatif,0)}</h3>
+                        <h3 class="text-2xl font-bold text-emerald-500" id="rekap-total-cuti">0</h3>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                         <p class="text-xs text-slate-500 mb-1">Total Mangkir</p>
-                        <h3 class="text-2xl font-bold text-red-500">${rekapData.reduce((a,b)=>a+b.mangkir,0)}</h3>
+                        <h3 class="text-2xl font-bold text-red-500" id="rekap-total-mangkir">0</h3>
                     </div>
                 </div>
 
@@ -1056,8 +1067,8 @@
                                     <th class="px-4 py-3 text-center text-red-600">Mangkir</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                ${rowsHTML}
+                            <tbody class="divide-y divide-slate-100" id="rekap-table-body">
+                                <!-- Rows injected by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -1066,6 +1077,70 @@
                     </div>
                 </div>
             </div>`;
+        }
+
+        function updateRekapTable() {
+            const container = document.getElementById('rekap-table-body');
+            if (!container) return;
+
+            // 1. Filter Data
+            let filtered = dataKaryawan;
+            
+            // Filter Dept
+            if (rekapFilterDept) {
+                filtered = filtered.filter(d => getProp(d, ['departemen', 'department']) === rekapFilterDept);
+            }
+            // Filter Div
+            if (rekapFilterDiv) {
+                filtered = filtered.filter(d => getProp(d, ['divisi', 'division']) === rekapFilterDiv);
+            }
+            // Filter Search
+            if (rekapSearchKeyword) {
+                const lowerKey = rekapSearchKeyword.toLowerCase();
+                filtered = filtered.filter(d => (getProp(d, ['nama_lengkap', 'name']) || '').toLowerCase().includes(lowerKey));
+            }
+
+            // 2. Map Data to Stats
+            const rekapData = filtered.map(emp => {
+                return {
+                    name: getProp(emp, ['nama_lengkap', 'name']),
+                    div: getProp(emp, ['divisi', 'division']),
+                    normatif: parseInt(getProp(emp, ['cuti_normatif', 'normatif']) || 0),
+                    tahunan: parseInt(getProp(emp, ['cuti_tahunan', 'tahunan']) || 0),
+                    sakit: parseInt(getProp(emp, ['sakit']) || 0),
+                    izin: parseInt(getProp(emp, ['izin']) || 0),
+                    terlambat: parseInt(getProp(emp, ['terlambat']) || 0),
+                    pulangAwal: parseInt(getProp(emp, ['pulang_awal', 'pulang_cepat']) || 0),
+                    mangkir: parseInt(getProp(emp, ['mangkir']) || 0)
+                };
+            });
+
+            // 3. Update Summary Stats
+            const totalTerlambat = rekapData.reduce((a, b) => a + b.terlambat, 0);
+            const totalSakit = rekapData.reduce((a, b) => a + b.sakit, 0);
+            const totalCuti = rekapData.reduce((a, b) => a + b.tahunan + b.normatif, 0);
+            const totalMangkir = rekapData.reduce((a, b) => a + b.mangkir, 0);
+
+            if(document.getElementById('rekap-total-terlambat')) document.getElementById('rekap-total-terlambat').innerText = totalTerlambat;
+            if(document.getElementById('rekap-total-sakit')) document.getElementById('rekap-total-sakit').innerText = totalSakit;
+            if(document.getElementById('rekap-total-cuti')) document.getElementById('rekap-total-cuti').innerText = totalCuti;
+            if(document.getElementById('rekap-total-mangkir')) document.getElementById('rekap-total-mangkir').innerText = totalMangkir;
+
+            // 4. Generate Rows HTML
+            const rowsHTML = rekapData.length > 0 ? rekapData.map((d) => `
+                <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0 transition">
+                    <td class="px-4 py-3 text-sm text-slate-700 font-medium">${d.name}<br><span class="text-[10px] text-slate-400 font-normal">${d.div}</span></td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.normatif}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.tahunan}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.sakit}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.izin}</td>
+                    <td class="px-4 py-3 text-center text-sm text-orange-600 font-medium bg-orange-50">${d.terlambat}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.pulangAwal}</td>
+                    <td class="px-4 py-3 text-center text-sm text-red-600 font-bold bg-red-50">${d.mangkir}</td>
+                </tr>
+            `).join('') : '<tr><td colspan="8" class="text-center py-10 text-slate-400">Tidak ada data ditemukan.</td></tr>';
+
+            container.innerHTML = rowsHTML;
         }
 
         // --- DIRECTORY SECTION (Updated: Structure Removed) ---
