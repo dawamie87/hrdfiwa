@@ -125,6 +125,9 @@
             <button onclick="renderPage('direktur')" id="sidebar-direktur" class="sidebar-link sidebar-inactive w-full">
                 <i data-lucide="users" class="w-5 h-5"></i><span class="flex-1 text-left">Data Karyawan</span>
             </button>
+            <button onclick="renderPage('rekap')" id="sidebar-rekap" class="sidebar-link sidebar-inactive w-full">
+                <i data-lucide="clipboard-list" class="w-5 h-5"></i><span class="flex-1 text-left">Rekap Absensi</span>
+            </button>
             <button onclick="renderPage('ebook')" id="sidebar-ebook" class="sidebar-link sidebar-inactive w-full">
                 <i data-lucide="book-open" class="w-5 h-5"></i><span class="flex-1 text-left">Ebook Panduan</span>
             </button>
@@ -241,7 +244,10 @@
                 <i data-lucide="menu" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Menu</span>
                 <!-- Mini Popover Menu -->
                 <div id="mobile-more-menu" class="hidden absolute bottom-[4.5rem] right-2 bg-white rounded-xl shadow-xl border border-slate-100 w-48 py-2 overflow-hidden origin-bottom-right">
-                    <div onclick="renderPage('ebook'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
+                    <div onclick="renderPage('rekap'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
+                        <i data-lucide="clipboard-list" class="w-4 h-4"></i> <span class="text-sm font-medium">Rekap Absensi</span>
+                    </div>
+                    <div onclick="renderPage('ebook'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700 border-t border-slate-100">
                         <i data-lucide="book-open" class="w-4 h-4"></i> <span class="text-sm font-medium">Ebook</span>
                     </div>
                     <div onclick="renderPage('generator'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700 border-t border-slate-100">
@@ -625,6 +631,7 @@
                     if (loadingState.karyawan) { document.getElementById('employee-list-container').innerHTML = '<div class="flex flex-col justify-center items-center h-64 text-slate-400"><div class="loader mb-3"></div><p>Memuat Data...</p></div>'; } 
                     else { updateEmployeeGrid(); } 
                     break;
+                case 'rekap': content.innerHTML = getRekapHTML(); break;
                 case 'ebook': content.innerHTML = getEbookHTML(); break;
                 case 'hrd': content.innerHTML = getKontakHRDHTML(); break;
                 case 'generator': content.innerHTML = getGeneratorHTML(); break;
@@ -944,6 +951,121 @@
             if (dataEbooks.length === 0) return '<div class="text-center p-10 text-slate-400">Belum ada Ebook.</div>';
             const listHTML = dataEbooks.map(ebook => `<div onclick="openEbookDetail('${getProp(ebook, 'id')}')" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex gap-4 items-center group cursor-pointer hover:border-blue-400 hover:shadow-md transition"><div class="w-16 h-20 shrink-0 ${ebook.color} rounded-lg flex items-center justify-center shadow-inner"><i data-lucide="book" class="w-8 h-8 opacity-80"></i></div><div class="flex-1 min-w-0"><h3 class="font-bold text-slate-800 text-sm mb-1 truncate group-hover:text-blue-600 transition">${getProp(ebook, ['title', 'judul', 'judul_buku'])}</h3><p class="text-xs text-slate-500 mb-3">Oleh: ${getProp(ebook, ['author', 'penulis', 'pengarang'])}</p><div class="flex items-center justify-between"><span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500">${getProp(ebook, ['pages', 'halaman', 'jml_halaman', 'jumlah_halaman'])} Hal</span><button class="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition"><i data-lucide="download" class="w-3 h-3"></i> Detail</button></div></div></div>`).join('');
             return `<div class="space-y-4"><div class="md:hidden flex items-center gap-2 mb-2"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="library" class="w-5 h-5"></i></div><h2 class="text-xl font-bold text-slate-800">Ebook Panduan</h2></div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${listHTML}</div></div>`;
+        }
+
+        // --- REKAP ABSENSI HTML (NEW) ---
+        function getRekapHTML() {
+            // Logic for Academic Year (Juli - Juni)
+            const today = new Date();
+            const currentMonth = today.getMonth(); // 0-11
+            const currentYear = today.getFullYear();
+            
+            // If month is Jan-Jun, academic year starts last year. If Jul-Dec, starts this year.
+            let academicYearStart = currentMonth < 6 ? currentYear - 1 : currentYear;
+            let academicYearEnd = academicYearStart + 1;
+            const academicYearLabel = `${academicYearStart}/${academicYearEnd}`;
+
+            // Generate Mock Data for Table if it doesn't exist
+            // Using existing dataKaryawan as base
+            const rekapData = dataKaryawan.map(emp => {
+                // Generate random stats for demo purposes
+                return {
+                    name: getProp(emp, ['nama_lengkap', 'name']),
+                    div: getProp(emp, ['divisi', 'division']),
+                    normatif: parseInt(getProp(emp, ['cuti_normatif', 'normatif']) || 0),
+                    tahunan: parseInt(getProp(emp, ['cuti_tahunan', 'tahunan']) || 0),
+                    sakit: parseInt(getProp(emp, ['sakit']) || 0),
+                    izin: parseInt(getProp(emp, ['izin']) || 0),
+                    terlambat: parseInt(getProp(emp, ['terlambat']) || 0),
+                    pulangAwal: parseInt(getProp(emp, ['pulang_awal', 'pulang_cepat']) || 0),
+                    mangkir: parseInt(getProp(emp, ['mangkir']) || 0)
+                };
+            });
+
+            const rowsHTML = rekapData.length > 0 ? rekapData.map((d, index) => `
+                <tr class="hover:bg-slate-50 border-b border-slate-100 last:border-0 transition">
+                    <td class="px-4 py-3 text-sm text-slate-700 font-medium">${d.name}<br><span class="text-[10px] text-slate-400 font-normal">${d.div}</span></td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.normatif}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.tahunan}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.sakit}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.izin}</td>
+                    <td class="px-4 py-3 text-center text-sm text-orange-600 font-medium bg-orange-50">${d.terlambat}</td>
+                    <td class="px-4 py-3 text-center text-sm text-slate-600">${d.pulangAwal}</td>
+                    <td class="px-4 py-3 text-center text-sm text-red-600 font-bold bg-red-50">${d.mangkir}</td>
+                </tr>
+            `).join('') : '<tr><td colspan="8" class="text-center py-4 text-slate-400">Tidak ada data karyawan.</td></tr>';
+
+            return `
+            <div class="space-y-6 fade-in">
+                <!-- Header Card -->
+                <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold mb-1">Rekap Kehadiran</h2>
+                            <p class="text-violet-100 text-sm">Laporan akumulasi absensi per Tahun Ajaran.</p>
+                        </div>
+                        <div class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-lg border border-white/20">
+                            <span class="text-[10px] uppercase tracking-wider opacity-80 block mb-0.5">Tahun Ajaran</span>
+                            <span class="text-lg font-mono font-bold">${academicYearLabel}</span>
+                        </div>
+                    </div>
+                    <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div>
+                </div>
+
+                <!-- Stats Summary (Mock) -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs text-slate-500 mb-1">Total Terlambat</p>
+                        <h3 class="text-2xl font-bold text-orange-500">${rekapData.reduce((a,b)=>a+b.terlambat,0)}</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs text-slate-500 mb-1">Total Sakit</p>
+                        <h3 class="text-2xl font-bold text-blue-500">${rekapData.reduce((a,b)=>a+b.sakit,0)}</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs text-slate-500 mb-1">Total Cuti</p>
+                        <h3 class="text-2xl font-bold text-emerald-500">${rekapData.reduce((a,b)=>a+b.tahunan + b.normatif,0)}</h3>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <p class="text-xs text-slate-500 mb-1">Total Mangkir</p>
+                        <h3 class="text-2xl font-bold text-red-500">${rekapData.reduce((a,b)=>a+b.mangkir,0)}</h3>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                            <i data-lucide="table" class="w-4 h-4 text-slate-400"></i> Data Per Karyawan
+                        </h3>
+                        <button class="text-xs text-blue-600 font-medium hover:underline flex items-center gap-1">
+                            <i data-lucide="download" class="w-3 h-3"></i> Export CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500 font-semibold tracking-wider">
+                                    <th class="px-4 py-3 min-w-[150px]">Nama Karyawan</th>
+                                    <th class="px-4 py-3 text-center">Cuti<br>Normatif</th>
+                                    <th class="px-4 py-3 text-center">Cuti<br>Tahunan</th>
+                                    <th class="px-4 py-3 text-center">Sakit</th>
+                                    <th class="px-4 py-3 text-center">Izin</th>
+                                    <th class="px-4 py-3 text-center text-orange-600">Datang<br>Terlambat</th>
+                                    <th class="px-4 py-3 text-center">Pulang<br>Awal</th>
+                                    <th class="px-4 py-3 text-center text-red-600">Mangkir</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                ${rowsHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 bg-slate-50 border-t border-slate-200 text-center">
+                        <p class="text-[10px] text-slate-400 italic">Data ditampilkan akumulasi dari Juli ${academicYearStart} s.d. Juni ${academicYearEnd}</p>
+                    </div>
+                </div>
+            </div>`;
         }
 
         // --- DIRECTORY SECTION (Updated: Structure Removed) ---
