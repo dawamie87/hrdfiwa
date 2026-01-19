@@ -960,7 +960,6 @@
                         const gelar = getProp(d, ['gelar', 'title']) || '';
                         const jab = getProp(d, ['jabatan', 'position']);
                         const nip = getProp(d, ['nip']);
-                        // NEW: Ambil variabel divisi untuk card
                         const divCard = getProp(d, ['divisi', 'division']) || '-'; 
                         
                         return `
@@ -971,7 +970,6 @@
                             <div class="w-full text-center">
                                 <h3 class="font-bold text-slate-800 text-sm truncate">${name}, ${gelar}</h3>
                                 <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider truncate mb-1">${jab}</p>
-                                <!-- NEW: Menambahkan Divisi di sini -->
                                 <p class="text-[10px] text-slate-500 mb-2 bg-slate-50 px-2 py-0.5 rounded inline-block truncate max-w-full">${divCard}</p>
                                 <span class="text-[10px] text-slate-400 block">NIP: ${nip}</span>
                             </div>
@@ -981,7 +979,6 @@
                 });
             }
             container.innerHTML = contentHTML;
-            // FIX: Re-run Lucide Icons so they appear in the injected HTML
             lucide.createIcons();
         }
 
@@ -1219,31 +1216,39 @@
             const modal = document.getElementById('global-modal');
             const modalContent = document.getElementById('modal-content');
             
-            // ... (Variable extraction remains same as previous code)
-            const name = getProp(emp, ['nama_lengkap', 'name']);
+            // Basic Info
+            const name = getProp(emp, ['nama_lengkap', 'name', 'Nama Lengkap']);
             const gelar = getProp(emp, ['gelar', 'title']) || '';
-            const jab = getProp(emp, ['jabatan', 'position']);
-            const nip = getProp(emp, ['nip']);
-            const dept = getProp(emp, ['departemen', 'department']);
-            const div = getProp(emp, ['divisi', 'division']);
-            const gender = getProp(emp, ['jenis_kelamin', 'gender']);
-            const date = getProp(emp, ['tanggal_bergabung', 'join_date']);
-            const edu = getProp(emp, ['pendidikan_terakhir', 'education']) || '-';
-            const eduName = getProp(emp, ['nama_pendidikan', 'school']) || '-';
+            const jab = getProp(emp, ['jabatan', 'position', 'Jabatan']);
+            const nip = getProp(emp, ['nip', 'NIP', 'nomor_induk']);
+            
+            // Job Details
+            const dept = getProp(emp, ['departemen', 'department', 'Departemen']);
+            const div = getProp(emp, ['divisi', 'division', 'Divisi']);
+            const gender = getProp(emp, ['jenis_kelamin', 'gender', 'Jenis Kelamin']);
+            const date = getProp(emp, ['tanggal_bergabung', 'join_date', 'Tanggal Bergabung']);
+            const status = getProp(emp, ['status_karyawan', 'status', 'employee_status', 'Status Karyawan']) || '-';
+            
+            // Keys requested by user
+            const contractEnd = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak', 'contract_end', 'Selesai Kontrak']);
+            const noHp = getProp(emp, ['No. Handphone', 'no_hp', 'no_handphone', 'hp', 'phone']) || '-';
+            const email = getProp(emp, ['email', 'surel', 'Email']) || '-';
+            const statusNikah = getProp(emp, ['status_pernikahan', 'marital_status', 'Status Pernikahan']) || '-';
+            
+            // Birth Details
+            const tempatLahir = getProp(emp, ['Tempat Lahir', 'tempat_lahir', 'birth_place']) || '';
+            const tglLahir = getProp(emp, ['Tanggal Lahir', 'tanggal_lahir', 'dob']);
+            
+            // Formatting
+            const formattedDate = formatDateIndo(date);
+            const formattedContractEnd = contractEnd ? formatDateIndo(contractEnd) : '-';
+            
+            const edu = getProp(emp, ['pendidikan_terakhir', 'education', 'Pendidikan']) || '-';
+            const eduName = getProp(emp, ['nama_pendidikan', 'school', 'Institusi']) || '-';
             const bpjsKes = getProp(emp, ['bpjs_kesehatan', 'bpjs_kes']) || '-';
             const bpjsKet = getProp(emp, ['bpjs_ketenagakerjaan', 'bpjs_tk']) || '-';
-            const img = getProp(emp, ['image', 'foto']);
-            const status = getProp(emp, ['status_karyawan', 'status', 'employee_status']) || '-';
-            const contractEnd = getProp(emp, ['tanggal_akhir_kontrak', 'akhir_kontrak', 'contract_end']);
-            const formattedDate = formatDateIndo(date);
-            const duration = hitungMasaKerja(date);
-
-            // New fields
-            const noHp = getProp(emp, ['no_hp', 'hp', 'phone']) || '-';
-            const email = getProp(emp, ['email', 'surel']) || '-';
-            const statusNikah = getProp(emp, ['status_pernikahan', 'marital_status']) || '-';
-            const tempatLahir = getProp(emp, ['tempat_lahir', 'birth_place']) || '';
-            const tglLahir = getProp(emp, ['tanggal_lahir', 'dob']);
+            const img = getProp(emp, ['image', 'foto', 'photo']);
+            
             const ttl = (tempatLahir ? tempatLahir + ', ' : '') + (tglLahir ? formatDateLongIndo(tglLahir) : '-');
 
             modalContent.innerHTML = `
@@ -1256,7 +1261,7 @@
                     <div class="flex flex-col items-center text-center mb-6"><img src="${getDirectDriveUrl(img)}" class="w-32 aspect-[3/4] rounded-xl border-4 border-white shadow-lg mb-3 object-cover bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><h2 class="text-xl font-bold text-slate-800">${name}, <span class="text-base font-medium text-slate-500">${gelar}</span></h2><p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mt-1">${jab}</p><span class="mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">NIP: ${nip}</span></div>
                     
                     <div class="space-y-5">
-                         <!-- Kontak & Pribadi (NEW SECTION) -->
+                         <!-- Kontak & Pribadi -->
                         <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
                             <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><i data-lucide="user-check" class="w-4 h-4"></i> Data Pribadi</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -1278,6 +1283,8 @@
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Jenis Kelamin</p><p class="font-medium text-slate-700 capitalize">${gender}</p></div>
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Status Karyawan</p><p class="font-medium text-slate-700 capitalize">${status}</p></div>
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Bergabung Sejak</p><p class="font-medium text-slate-700">${formattedDate}</p></div>
+                            <!-- Added Contract End Here -->
+                            <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Akhir Kontrak</p><p class="font-medium text-${contractEnd ? 'red-600' : 'slate-700'}">${formattedContractEnd}</p></div>
                         </div>
 
                         <div class="border-t border-slate-100 pt-4"><h4 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-4 h-4 text-blue-500"></i> Pendidikan</h4><div class="flex justify-between text-sm"><span class="text-slate-500">Pendidikan Terakhir</span><span class="font-medium text-slate-700 text-right">${edu} - ${eduName}</span></div></div>
