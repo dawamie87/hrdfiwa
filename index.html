@@ -8,6 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3678/3678166.png">
     
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -78,7 +79,9 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen selection:bg-blue-100 selection:text-blue-700">
 
+    <!-- SIDEBAR (Desktop) -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+        <!-- LOGO HEADER -->
         <div class="px-6 py-6 border-b border-slate-100 mb-2 bg-white z-10 transition-colors">
             <div class="flex items-center gap-3.5 select-none">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200 ring-2 ring-blue-50 ring-offset-1 transform hover:scale-105 transition-transform duration-300">
@@ -91,6 +94,7 @@
             </div>
         </div>
 
+        <!-- NAVIGATION -->
         <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
             <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full">
                 <i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span>
@@ -112,7 +116,9 @@
             </button>
         </nav>
 
+        <!-- PROFILE & DARK MODE WIDGET -->
         <div class="p-4 border-t border-slate-100 bg-white z-10 transition-colors space-y-3">
+            <!-- Dark Mode Toggle -->
             <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition text-slate-600">
                 <div class="flex items-center gap-2 text-sm font-medium">
                     <i data-lucide="moon" class="w-4 h-4"></i>
@@ -136,7 +142,9 @@
         </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative transition-colors">
+        <!-- HEADER (Mobile Only) -->
         <header class="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:hidden transition-colors">
             <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-2.5">
@@ -157,6 +165,7 @@
             </div>
         </header>
 
+        <!-- DESKTOP HEADER (Hidden Mobile) -->
         <header class="hidden md:block pt-8 pb-4 px-8">
             <div class="flex justify-between items-end">
                 <div>
@@ -169,6 +178,7 @@
                     </button>
                     <div class="h-8 w-px bg-slate-200 mx-2"></div>
                     <p class="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm transition-colors" id="date-display">
+                        <!-- JS Date will go here -->
                         Memuat tanggal...
                     </p>
                 </div>
@@ -177,6 +187,7 @@
 
         <main id="app-content" class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8"></main>
 
+        <!-- MODAL SYSTEM -->
         <div id="global-modal" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
@@ -186,9 +197,11 @@
             </div>
         </div>
 
+        <!-- TOAST SYSTEM -->
         <div id="toast-container" class="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[70] flex flex-col items-end gap-2 pointer-events-none"></div>
     </div>
 
+    <!-- MOBILE NAVIGATION (Bottom Bar) -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)] transition-colors">
         <div class="grid grid-cols-5 h-[4rem]"> 
             <button onclick="renderPage('beranda')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 active-tab-nav" id="nav-beranda">
@@ -203,8 +216,10 @@
             <button onclick="renderPage('hrd')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-hrd">
                 <i data-lucide="headset" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Layanan</span>
             </button>
+            <!-- More menu for others -->
             <button onclick="openMoreMenu()" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav relative">
                 <i data-lucide="menu" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Menu</span>
+                <!-- Mini Popover Menu -->
                 <div id="mobile-more-menu" class="hidden absolute bottom-[4.5rem] right-2 bg-white rounded-xl shadow-xl border border-slate-100 w-48 py-2 overflow-hidden origin-bottom-right">
                     <div onclick="renderPage('ebook'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
                         <i data-lucide="book-open" class="w-4 h-4"></i> <span class="text-sm font-medium">Ebook</span>
@@ -319,7 +334,6 @@
 
         function getDirectDriveUrl(url) {
             if (!url) return 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback';
-            // FIX: Added '$' before {match[0]} for correct string interpolation
             if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
                 const idRegex = /[-\w]{25,}/;
                 const match = url.match(idRegex);
@@ -418,9 +432,11 @@
         // --- MOCK DATA GENERATOR (FALLBACK) ---
         function getMockData(type) {
             if (type === 'karyawan') {
-                const currentYear = new Date().getFullYear();
-                const currentMonth = new Date().getMonth();
-                const birthDateThisMonth = `${currentYear-25}-${String(currentMonth+1).padStart(2,'0')}-15`;
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth();
+                
+                // MOCK DATA: Ditambahkan tanggal join hari ini untuk testing fitur "Karyawan Baru"
                 return [
                     { 
                         id: 1, 
@@ -430,7 +446,7 @@
                         departemen: "Teknologi", 
                         jabatan: "Senior Developer", 
                         jenis_kelamin: "Ikhwan", 
-                        tanggal_bergabung: "2020-01-15", 
+                        tanggal_bergabung: new Date().toISOString(), // Bergabung Hari Ini (Untuk Test)
                         tanggal_lahir: "1990-05-12",
                         tempat_lahir: "Jakarta",
                         no_hp: "08123456789",
@@ -450,7 +466,7 @@
                         jabatan: "HR Manager", 
                         jenis_kelamin: "Akhwat", 
                         tanggal_bergabung: "2019-05-20", 
-                        tanggal_lahir: birthDateThisMonth,
+                        tanggal_lahir: "1995-05-20",
                         tempat_lahir: "Bogor",
                         no_hp: "08129876543",
                         email: "siti@contoh.com",
@@ -524,7 +540,6 @@
                 onSuccess(getMockData(type));
             } finally {
                 loadingState[type] = false;
-                // FIX: Ensure UI refreshes even on error to hide loader
                 if (type === 'karyawan' && currentPage === 'direktur') renderPage('direktur');
                 if (type === 'info' && currentPage === 'informasi') renderPage('informasi');
                 if (type === 'ebook' && currentPage === 'ebook') renderPage('ebook');
@@ -591,11 +606,21 @@
             const now = new Date();
             const currentMonth = now.getMonth();
             
-            const newJoiners = [...dataKaryawan].sort((a, b) => {
+            // --- LOGIKA BARU KARYAWAN TERBARU ---
+            // Menampilkan semua karyawan yang join date-nya >= tanggal 1 bulan ini
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            const newJoiners = dataKaryawan.filter(emp => {
+                const joinDate = parseDate(getProp(emp, ['tanggal_bergabung', 'join_date']));
+                // Filter: Harus valid date & lebih besar/sama dengan tanggal 1 bulan ini
+                return joinDate && joinDate >= startOfMonth;
+            }).sort((a, b) => {
+                // Urutkan dari yang paling baru
                 const dateA = parseDate(getProp(a, ['tanggal_bergabung', 'join_date']));
                 const dateB = parseDate(getProp(b, ['tanggal_bergabung', 'join_date']));
-                return (dateB || 0) - (dateA || 0); 
-            }).slice(0, 5);
+                return dateB - dateA;
+            });
+            // ------------------------------------
 
             const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
@@ -617,6 +642,7 @@
             });
 
             return `<div class="space-y-6">
+                <!-- Welcome Banner -->
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
                     <div class="relative z-10">
                         <h2 class="text-2xl font-bold mb-1">Dashboard Karyawan</h2>
@@ -625,6 +651,7 @@
                     <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div>
                 </div>
 
+                <!-- PRAYER TIMES WIDGET (Landscape) -->
                 <div class="bg-emerald-600 rounded-2xl p-6 text-white shadow-lg shadow-emerald-200 relative overflow-hidden mb-6">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mb-10 blur-xl"></div>
@@ -650,6 +677,7 @@
                     </div>
                 </div>
 
+                <!-- Stats Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
                         <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="users" class="w-5 h-5"></i></div>
@@ -669,6 +697,7 @@
                     </div>
                 </div>
 
+                <!-- Charts Area -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3>
@@ -680,6 +709,7 @@
                     </div>
                 </div>
                 
+                <!-- Education Chart -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3>
                     <div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div>
@@ -708,13 +738,14 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
-                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                     <!-- Karyawan Terbaru -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i> Karyawan Terbaru</h3>
                             <span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">${newJoiners.length}</span>
                         </div>
                         <div class="space-y-3 max-h-64 overflow-y-auto pr-1 no-scrollbar">
-                            ${newJoiners.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada karyawan baru.</p>' : newJoiners.map(emp => { 
+                            ${newJoiners.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-4">Belum ada karyawan baru bulan ini.</p>' : newJoiners.map(emp => { 
                                 const name = getProp(emp, ['nama_lengkap', 'nama']); 
                                 const div = getProp(emp, ['divisi', 'division']); 
                                 const joinDate = getProp(emp, ['tanggal_bergabung', 'join_date']);
@@ -743,14 +774,17 @@
                         </div>
                     </div>
                     
+                    <!-- CALENDAR AND AGENDA -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full lg:col-span-1">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender & Agenda</h3>
                         
                         <div class="flex flex-col gap-6">
+                            <!-- Calendar Widget -->
                             <div class="flex-1">
                                 ${calendarHTML}
                             </div>
 
+                            <!-- Agenda List (Scrollable) -->
                             <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t border-slate-100 pt-3 max-h-48">
                                 <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Agenda Mendatang</h4>
                                 ${upcomingAgendas.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda mendatang.</p>' : 
@@ -889,6 +923,7 @@
                         <div class="relative flex-1 min-w-[150px]"><i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i><input type="text" id="searchInput" placeholder="Cari..." oninput="handleSearch(this.value)" value="${searchKeyword}" class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm placeholder:text-slate-400"></div>
                         <div class="relative w-auto"><select onchange="handleSort(this.value)" class="pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm cursor-pointer appearance-none"><option value="name_asc" ${sortOrder === 'name_asc' ? 'selected' : ''}>A-Z</option><option value="name_desc" ${sortOrder === 'name_desc' ? 'selected' : ''}>Z-A</option><option value="date_new" ${sortOrder === 'date_new' ? 'selected' : ''}>Baru</option></select><i data-lucide="arrow-up-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div>
                         <div class="relative w-auto"><select onchange="handleFilter('dept', this.value)" class="w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none truncate"><option value="">Dept: Semua</option>${deptOptions}</select><i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div>
+                         <div class="relative w-auto"><select onchange="handleFilter('div', this.value)" class="w-full pl-3 pr-8 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-600 shadow-sm appearance-none truncate"><option value="">Div: Semua</option>${divOptions}</select><i data-lucide="chevron-down" class="absolute right-2 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i></div>
                     </div>
                 </div>
                 <div id="employee-list-container" class="fade-in min-h-[300px]"></div>
@@ -925,7 +960,22 @@
                         const gelar = getProp(d, ['gelar', 'title']) || '';
                         const jab = getProp(d, ['jabatan', 'position']);
                         const nip = getProp(d, ['nip']);
-                        return `<div onclick="openDetail('${getProp(d, 'id')}')" class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col items-center gap-3 hover:shadow-md hover:border-blue-300 transition cursor-pointer group"><div class="relative w-full aspect-[3/4] overflow-hidden rounded-lg"><img src="${getDirectDriveUrl(img)}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"></div><div class="w-full text-center"><h3 class="font-bold text-slate-800 text-sm truncate">${name}, ${gelar}</h3><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider truncate mb-1">${jab}</p><span class="text-[10px] text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full inline-block">NIP: ${nip}</span></div></div>`;
+                        // NEW: Ambil variabel divisi untuk card
+                        const divCard = getProp(d, ['divisi', 'division']) || '-'; 
+                        
+                        return `
+                        <div onclick="openDetail('${getProp(d, 'id')}')" class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm flex flex-col items-center gap-3 hover:shadow-md hover:border-blue-300 transition cursor-pointer group">
+                            <div class="relative w-full aspect-[3/4] overflow-hidden rounded-lg">
+                                <img src="${getDirectDriveUrl(img)}" alt="${name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'">
+                            </div>
+                            <div class="w-full text-center">
+                                <h3 class="font-bold text-slate-800 text-sm truncate">${name}, ${gelar}</h3>
+                                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider truncate mb-1">${jab}</p>
+                                <!-- NEW: Menambahkan Divisi di sini -->
+                                <p class="text-[10px] text-slate-500 mb-2 bg-slate-50 px-2 py-0.5 rounded inline-block truncate max-w-full">${divCard}</p>
+                                <span class="text-[10px] text-slate-400 block">NIP: ${nip}</span>
+                            </div>
+                        </div>`;
                     }).join('');
                     contentHTML += `<div class="mb-6 fade-in"><h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 pl-1 border-l-4 border-blue-500 ml-1">Divisi ${divisiName}</h3><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">${cardsHTML}</div></div>`;
                 });
@@ -938,6 +988,7 @@
         function getGeneratorHTML() {
             return `
             <div class="max-w-2xl mx-auto space-y-8 fade-in">
+                <!-- Calculator -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center"><i data-lucide="calculator" class="w-5 h-5"></i></div>
@@ -974,6 +1025,7 @@
                     </div>
                 </div>
 
+                <!-- Text Generator -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="align-left" class="w-5 h-5"></i></div>
@@ -1003,6 +1055,7 @@
                     </div>
                 </div>
 
+                <!-- Link Generator -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center"><i data-lucide="image" class="w-5 h-5"></i></div>
@@ -1203,7 +1256,8 @@
                     <div class="flex flex-col items-center text-center mb-6"><img src="${getDirectDriveUrl(img)}" class="w-32 aspect-[3/4] rounded-xl border-4 border-white shadow-lg mb-3 object-cover bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><h2 class="text-xl font-bold text-slate-800">${name}, <span class="text-base font-medium text-slate-500">${gelar}</span></h2><p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mt-1">${jab}</p><span class="mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">NIP: ${nip}</span></div>
                     
                     <div class="space-y-5">
-                         <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                         <!-- Kontak & Pribadi (NEW SECTION) -->
+                        <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
                             <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><i data-lucide="user-check" class="w-4 h-4"></i> Data Pribadi</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div><p class="text-xs text-slate-400 mb-0.5">No. Handphone</p>
@@ -1217,6 +1271,7 @@
                             </div>
                         </div>
 
+                        <!-- Data Pekerjaan -->
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Departemen</p><p class="font-medium text-slate-700">${dept}</p></div>
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Divisi</p><p class="font-medium text-slate-700">${div}</p></div>
@@ -1306,6 +1361,7 @@
                         <div class="flex-1">
                             <h3 class="font-bold text-slate-800">Admin Kepegawaian</h3>
                             <p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p>
+                            <!-- Updated Button for Leave Form -->
                             <button onclick="openLeaveForm()" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto shadow-md shadow-blue-200"><i data-lucide="file-plus" class="w-4 h-4"></i> Buat Pengajuan Cuti</button>
                         </div>
                     </div>
@@ -1318,6 +1374,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Informasi Kantor -->
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 bg-slate-50/50">
                         <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2">
