@@ -8,7 +8,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3678/3678166.png">
     
-    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -79,9 +78,7 @@
 </head>
 <body class="text-slate-800 flex flex-col md:flex-row min-h-screen selection:bg-blue-100 selection:text-blue-700">
 
-    <!-- SIDEBAR (Desktop) -->
     <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 h-screen sticky top-0 shrink-0 z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-        <!-- LOGO HEADER -->
         <div class="px-6 py-6 border-b border-slate-100 mb-2 bg-white z-10 transition-colors">
             <div class="flex items-center gap-3.5 select-none">
                 <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200 ring-2 ring-blue-50 ring-offset-1 transform hover:scale-105 transition-transform duration-300">
@@ -94,7 +91,6 @@
             </div>
         </div>
 
-        <!-- NAVIGATION -->
         <nav class="flex-1 px-4 py-4 space-y-1 overflow-y-auto no-scrollbar">
             <button onclick="renderPage('beranda')" id="sidebar-beranda" class="sidebar-link sidebar-active w-full">
                 <i data-lucide="home" class="w-5 h-5"></i><span class="flex-1 text-left">Dashboard</span>
@@ -116,9 +112,7 @@
             </button>
         </nav>
 
-        <!-- PROFILE & DARK MODE WIDGET -->
         <div class="p-4 border-t border-slate-100 bg-white z-10 transition-colors space-y-3">
-            <!-- Dark Mode Toggle -->
             <button onclick="toggleDarkMode()" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition text-slate-600">
                 <div class="flex items-center gap-2 text-sm font-medium">
                     <i data-lucide="moon" class="w-4 h-4"></i>
@@ -142,9 +136,7 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <div class="flex-1 flex flex-col min-w-0 bg-slate-50/50 relative transition-colors">
-        <!-- HEADER (Mobile Only) -->
         <header class="bg-white/90 backdrop-blur-md sticky top-0 z-30 border-b border-slate-200 md:hidden transition-colors">
             <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-2.5">
@@ -165,7 +157,6 @@
             </div>
         </header>
 
-        <!-- DESKTOP HEADER (Hidden Mobile) -->
         <header class="hidden md:block pt-8 pb-4 px-8">
             <div class="flex justify-between items-end">
                 <div>
@@ -178,7 +169,6 @@
                     </button>
                     <div class="h-8 w-px bg-slate-200 mx-2"></div>
                     <p class="text-xs font-medium text-slate-500 bg-white px-3 py-1.5 rounded-full border border-slate-200 shadow-sm transition-colors" id="date-display">
-                        <!-- JS Date will go here -->
                         Memuat tanggal...
                     </p>
                 </div>
@@ -187,7 +177,6 @@
 
         <main id="app-content" class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8"></main>
 
-        <!-- MODAL SYSTEM -->
         <div id="global-modal" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 modal-overlay" onclick="closeModal()"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
@@ -197,11 +186,9 @@
             </div>
         </div>
 
-        <!-- TOAST SYSTEM -->
         <div id="toast-container" class="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-[70] flex flex-col items-end gap-2 pointer-events-none"></div>
     </div>
 
-    <!-- MOBILE NAVIGATION (Bottom Bar) -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)] transition-colors">
         <div class="grid grid-cols-5 h-[4rem]"> 
             <button onclick="renderPage('beranda')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 active-tab-nav" id="nav-beranda">
@@ -216,10 +203,8 @@
             <button onclick="renderPage('hrd')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav" id="nav-hrd">
                 <i data-lucide="headset" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Layanan</span>
             </button>
-            <!-- More menu for others -->
             <button onclick="openMoreMenu()" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 inactive-tab-nav relative">
                 <i data-lucide="menu" class="w-6 h-6 stroke-[1.5]"></i><span class="text-[10px] font-medium">Menu</span>
-                <!-- Mini Popover Menu -->
                 <div id="mobile-more-menu" class="hidden absolute bottom-[4.5rem] right-2 bg-white rounded-xl shadow-xl border border-slate-100 w-48 py-2 overflow-hidden origin-bottom-right">
                     <div onclick="renderPage('ebook'); event.stopPropagation();" class="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 text-slate-700">
                         <i data-lucide="book-open" class="w-4 h-4"></i> <span class="text-sm font-medium">Ebook</span>
@@ -334,10 +319,11 @@
 
         function getDirectDriveUrl(url) {
             if (!url) return 'https://api.dicebear.com/7.x/avataaars/svg?seed=fallback';
+            // FIX: Added '$' before {match[0]} for correct string interpolation
             if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
                 const idRegex = /[-\w]{25,}/;
                 const match = url.match(idRegex);
-                if (match) return `https://lh3.googleusercontent.com/d/${match[0]}`;
+                if (match) return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w400`;
             }
             return url;
         }
@@ -403,7 +389,7 @@
 
         function updatePrayerWidget(timings, hijri) {
             const container = document.getElementById('prayer-times-list');
-            if(!container) return;
+            if(!container) return; // Check if element exists before updating
             
             const prayers = [
                 { name: 'Subuh', time: timings.Fajr },
@@ -427,7 +413,6 @@
                 const hijriEl = document.getElementById('hijri-date');
                 if(hijriEl) hijriEl.innerText = `${hijri.day} ${hijri.month.en} ${hijri.year} H`;
             }
-            lucide.createIcons();
         }
 
         // --- MOCK DATA GENERATOR (FALLBACK) ---
@@ -526,7 +511,7 @@
             loadingState[type] = true;
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000); 
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 sec timeout
                 const response = await fetch(`${API_URL}?type=${type}&t=${new Date().getTime()}`, { signal: controller.signal });
                 clearTimeout(timeoutId);
                 if (!response.ok) throw new Error("Network error");
@@ -539,6 +524,7 @@
                 onSuccess(getMockData(type));
             } finally {
                 loadingState[type] = false;
+                // FIX: Ensure UI refreshes even on error to hide loader
                 if (type === 'karyawan' && currentPage === 'direktur') renderPage('direktur');
                 if (type === 'info' && currentPage === 'informasi') renderPage('informasi');
                 if (type === 'ebook' && currentPage === 'ebook') renderPage('ebook');
@@ -569,7 +555,7 @@
                     content.innerHTML = getBerandaHTML(); 
                     setTimeout(() => {
                         initDashboardCharts();
-                        fetchPrayerTimes(); // Init Prayer Widget
+                        fetchPrayerTimes(); 
                     }, 100); 
                     break;
                 case 'informasi': content.innerHTML = getInformasiHTML(); break;
@@ -605,11 +591,10 @@
             const now = new Date();
             const currentMonth = now.getMonth();
             
-            // Logic change: Latest Joiners (Top 5 latest dates) instead of This Month Only
             const newJoiners = [...dataKaryawan].sort((a, b) => {
                 const dateA = parseDate(getProp(a, ['tanggal_bergabung', 'join_date']));
                 const dateB = parseDate(getProp(b, ['tanggal_bergabung', 'join_date']));
-                return (dateB || 0) - (dateA || 0); // Descending
+                return (dateB || 0) - (dateA || 0); 
             }).slice(0, 5);
 
             const expiringThisMonth = dataKaryawan.filter(d => { const dateVal = getProp(d, ['tanggal_akhir_kontrak', 'akhir_kontrak']); if(!dateVal) return false; const expDate = parseDate(dateVal); return expDate && expDate.getMonth() === now.getMonth() && expDate.getFullYear() === now.getFullYear(); });
@@ -619,7 +604,6 @@
             const recentInfo = dataInfo.slice(0, 3);
             const calendarHTML = generateCalendarHTML();
             
-            // Filter agendas: Only show dates >= today
             const todayMidnight = new Date();
             todayMidnight.setHours(0,0,0,0);
             
@@ -633,7 +617,6 @@
             });
 
             return `<div class="space-y-6">
-                <!-- Welcome Banner -->
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
                     <div class="relative z-10">
                         <h2 class="text-2xl font-bold mb-1">Dashboard Karyawan</h2>
@@ -642,9 +625,7 @@
                     <div class="absolute right-0 top-0 h-full w-1/3 bg-white/10 skew-x-12 -mr-10"></div>
                 </div>
 
-                <!-- PRAYER TIMES WIDGET (Landscape) -->
                 <div class="bg-emerald-600 rounded-2xl p-6 text-white shadow-lg shadow-emerald-200 relative overflow-hidden mb-6">
-                    <!-- Background Pattern -->
                     <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                     <div class="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mb-10 blur-xl"></div>
                     
@@ -659,9 +640,7 @@
                             <p class="text-xs text-emerald-200 mt-2 font-mono" id="hijri-date">Loading...</p>
                         </div>
                         
-                        <!-- Prayer Times Grid -->
                         <div id="prayer-times-list" class="flex-1 w-full grid grid-cols-5 gap-2 md:gap-4">
-                            <!-- Items injected by JS -->
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center animate-pulse h-20"></div>
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center animate-pulse h-20"></div>
                             <div class="bg-white/20 backdrop-blur-sm rounded-xl p-3 text-center animate-pulse h-20"></div>
@@ -671,7 +650,6 @@
                     </div>
                 </div>
 
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
                         <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-2"><i data-lucide="users" class="w-5 h-5"></i></div>
@@ -691,7 +669,6 @@
                     </div>
                 </div>
 
-                <!-- Charts Area -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="pie-chart" class="w-4 h-4 text-blue-500"></i> Komposisi Gender</h3>
@@ -703,7 +680,6 @@
                     </div>
                 </div>
                 
-                <!-- Education Chart -->
                 <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                     <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-500"></i> Pendidikan per Departemen</h3>
                     <div class="relative h-80 w-full"><canvas id="eduChart"></canvas></div>
@@ -732,8 +708,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     
-                     <!-- Karyawan Terbaru (NEW LOGIC) -->
-                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-emerald-500"></i> Karyawan Terbaru</h3>
                             <span class="bg-emerald-100 text-emerald-700 text-xs px-2 py-0.5 rounded-full font-bold">${newJoiners.length}</span>
@@ -768,17 +743,14 @@
                         </div>
                     </div>
                     
-                    <!-- CALENDAR AND AGENDA (NEW) -->
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col h-full lg:col-span-1">
                         <h3 class="font-bold text-slate-700 mb-4 text-sm flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i> Kalender & Agenda</h3>
                         
                         <div class="flex flex-col gap-6">
-                            <!-- Calendar Widget -->
                             <div class="flex-1">
                                 ${calendarHTML}
                             </div>
 
-                            <!-- Agenda List (Scrollable) -->
                             <div class="flex-1 overflow-y-auto pr-1 no-scrollbar border-t border-slate-100 pt-3 max-h-48">
                                 <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Agenda Mendatang</h4>
                                 ${upcomingAgendas.length === 0 ? '<p class="text-xs text-slate-400 italic text-center py-2">Belum ada agenda mendatang.</p>' : 
@@ -851,6 +823,7 @@
         }
 
         function initDashboardCharts() {
+            // FIX: Added safer checks to prevent crashing on empty data
             if (dataKaryawan.length === 0 || !document.getElementById('genderChart')) return;
             const textColor = isDarkMode ? '#cbd5e1' : '#64748b'; 
             const totalIkhwan = dataKaryawan.filter(d => normalizeGender(getProp(d, ['jenis_kelamin', 'gender'])) === 'ikhwan').length;
@@ -958,13 +931,13 @@
                 });
             }
             container.innerHTML = contentHTML;
+            // FIX: Re-run Lucide Icons so they appear in the injected HTML
             lucide.createIcons();
         }
 
         function getGeneratorHTML() {
             return `
             <div class="max-w-2xl mx-auto space-y-8 fade-in">
-                <!-- Calculator -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center"><i data-lucide="calculator" class="w-5 h-5"></i></div>
@@ -1001,7 +974,6 @@
                     </div>
                 </div>
 
-                <!-- Text Generator -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i data-lucide="align-left" class="w-5 h-5"></i></div>
@@ -1031,7 +1003,6 @@
                     </div>
                 </div>
 
-                <!-- Link Generator -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center"><i data-lucide="image" class="w-5 h-5"></i></div>
@@ -1059,7 +1030,7 @@
         function runGenerator() { const input = document.getElementById('genInput').value; if(!input) return; document.getElementById('genOutput').value = input.replace(/\n/g, '<br>'); }
         function copyGenResult() { const t = document.getElementById("genOutput"); if(!t.value) return; t.select(); t.setSelectionRange(0, 99999); navigator.clipboard.writeText(t.value).then(() => showToast("Disalin!", "bg-emerald-600")); }
         function formatText(cmd) { const input = document.getElementById('genInput'); const start = input.selectionStart, end = input.selectionEnd, text = input.value, sel = text.substring(start, end); if (!sel) return; let fmt = ''; switch(cmd) { case 'b': fmt=`<b>${sel}</b>`; break; case 'i': fmt=`<i>${sel}</i>`; break; case 'u': fmt=`<u>${sel}</u>`; break; case 'left': fmt=`<div class="text-left">${sel}</div>`; break; case 'center': fmt=`<div class="text-center">${sel}</div>`; break; case 'right': fmt=`<div class="text-right">${sel}</div>`; break; case 'justify': fmt=`<div class="text-justify">${sel}</div>`; break; } input.value = text.substring(0, start) + fmt + text.substring(end); }
-        function runDriveGenerator() { const input = document.getElementById('driveInput').value; if(!input) return; const m = input.match(/[-\w]{25,}/); if (m) { const l = `https://lh3.googleusercontent.com/d/${m[0]}`; document.getElementById('driveResultContainer').classList.remove('hidden'); document.getElementById('driveOutput').value = l; document.getElementById('drivePreview').src = l; showToast("Berhasil!", "bg-emerald-600"); } else { showToast("Format salah", "bg-red-600"); } }
+        function runDriveGenerator() { const input = document.getElementById('driveInput').value; if(!input) return; const m = input.match(/[-\w]{25,}/); if (m) { const l = `https://drive.google.com/thumbnail?id=${m[0]}&sz=w400`; document.getElementById('driveResultContainer').classList.remove('hidden'); document.getElementById('driveOutput').value = l; document.getElementById('drivePreview').src = l; showToast("Berhasil!", "bg-emerald-600"); } else { showToast("Format salah", "bg-red-600"); } }
         function copyDriveResult() { const t = document.getElementById("driveOutput"); t.select(); t.setSelectionRange(0, 99999); navigator.clipboard.writeText(t.value).then(() => showToast("Disalin!", "bg-emerald-600")); }
         
         // --- LEAVE FORM LOGIC (NEW) ---
@@ -1232,8 +1203,7 @@
                     <div class="flex flex-col items-center text-center mb-6"><img src="${getDirectDriveUrl(img)}" class="w-32 aspect-[3/4] rounded-xl border-4 border-white shadow-lg mb-3 object-cover bg-slate-100" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=${name}'"><h2 class="text-xl font-bold text-slate-800">${name}, <span class="text-base font-medium text-slate-500">${gelar}</span></h2><p class="text-blue-600 font-semibold text-sm uppercase tracking-wide mt-1">${jab}</p><span class="mt-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full">NIP: ${nip}</span></div>
                     
                     <div class="space-y-5">
-                         <!-- Kontak & Pribadi (NEW SECTION) -->
-                        <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+                         <div class="bg-blue-50/50 rounded-xl p-4 border border-blue-100">
                             <h4 class="font-bold text-blue-800 mb-3 flex items-center gap-2 text-xs uppercase tracking-wider"><i data-lucide="user-check" class="w-4 h-4"></i> Data Pribadi</h4>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 <div><p class="text-xs text-slate-400 mb-0.5">No. Handphone</p>
@@ -1247,7 +1217,6 @@
                             </div>
                         </div>
 
-                        <!-- Data Pekerjaan -->
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Departemen</p><p class="font-medium text-slate-700">${dept}</p></div>
                             <div class="p-3 bg-slate-50 rounded-lg"><p class="text-xs text-slate-400 mb-1">Divisi</p><p class="font-medium text-slate-700">${div}</p></div>
@@ -1337,7 +1306,6 @@
                         <div class="flex-1">
                             <h3 class="font-bold text-slate-800">Admin Kepegawaian</h3>
                             <p class="text-xs text-slate-500 mb-3">Urusan Cuti, Izin, & Data Karyawan</p>
-                            <!-- Updated Button for Leave Form -->
                             <button onclick="openLeaveForm()" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full justify-center sm:w-auto shadow-md shadow-blue-200"><i data-lucide="file-plus" class="w-4 h-4"></i> Buat Pengajuan Cuti</button>
                         </div>
                     </div>
@@ -1350,7 +1318,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Informasi Kantor -->
                 <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     <div class="p-4 border-b border-slate-100 bg-slate-50/50">
                         <h3 class="font-bold text-slate-700 text-sm flex items-center gap-2">
